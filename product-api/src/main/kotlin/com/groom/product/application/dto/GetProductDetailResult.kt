@@ -1,9 +1,7 @@
 package com.groom.product.application.dto
 
 import com.groom.product.domain.model.Product
-import com.groom.product.domain.model.ProductCategory
 import com.groom.product.domain.model.ProductImage
-import com.groom.ecommerce.store.domain.model.Store
 import java.math.BigDecimal
 
 /**
@@ -41,15 +39,7 @@ data class GetProductDetailResult(
     data class StoreInfo(
         val id: String,
         val name: String,
-    ) {
-        companion object {
-            fun from(store: Store): StoreInfo =
-                StoreInfo(
-                    id = store.id.toString(),
-                    name = store.name,
-                )
-        }
-    }
+    )
 
     data class ProductImageInfo(
         val imageUrl: String,
@@ -67,7 +57,6 @@ data class GetProductDetailResult(
     companion object {
         fun from(
             product: Product,
-            store: Store,
             categoryPath: String?,
         ): GetProductDetailResult =
             GetProductDetailResult(
@@ -79,7 +68,10 @@ data class GetProductDetailResult(
                 status = product.status,
                 categoryId = product.categoryId.toString(),
                 categoryPath = categoryPath,
-                store = StoreInfo.from(store),
+                store = StoreInfo(
+                    id = product.storeId.toString(),
+                    name = product.storeName,
+                ),
                 images = product.images.map { ProductImageInfo.from(it) },
                 createdAt = product.createdAt.toString(),
             )

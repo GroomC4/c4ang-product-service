@@ -2,7 +2,7 @@ package com.groom.product.application.service
 
 import com.groom.product.application.dto.ListOwnerProductsQuery
 import com.groom.product.application.dto.ListOwnerProductsResult
-import com.groom.product.infrastructure.repository.ProductPersistenceAdapter
+import com.groom.product.domain.port.SearchProductsPort
 import com.groom.product.infrastructure.repository.ProductSpecifications
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class ListOwnerProductsService(
-    private val productRepository: ProductPersistenceAdapter,
+    private val searchProductsPort: SearchProductsPort,
 ) {
     /**
      * 판매자의 상품 목록을 조회합니다.
@@ -49,7 +49,7 @@ class ListOwnerProductsService(
         val pageable = PageRequest.of(query.page, query.size, sort)
 
         // 3. 검색 실행
-        val productPage = productRepository.findAll(spec, pageable)
+        val productPage = searchProductsPort.search(spec, pageable)
 
         // 4. Result DTO 생성
         val productSummaries =
@@ -66,29 +66,17 @@ class ListOwnerProductsService(
         )
     }
 
-    /**
-     * 정렬 기준과 방향으로 Sort 객체 생성.
-     */
     private fun createSort(
         sortBy: String,
         sortOrder: String,
     ): Sort {
-        val direction =
-            if (sortOrder.equals("asc", ignoreCase = true)) {
-                Sort.Direction.ASC
-            } else {
-                Sort.Direction.DESC
-            }
+        val direction = if (sortOrder.equals("desc", ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
 
-        val property =
-            when (sortBy.lowercase()) {
-                "name" -> "name"
-                "price" -> "price"
-                "stockquantity" -> "stockQuantity"
-                "createdat" -> "createdAt"
-                else -> "createdAt"
-            }
-
-        return Sort.by(direction, property)
+        return when (sortBy.lowercase()) {
+            "name" -> Sort.by(direction, "name")
+            "price" -> Sort.by(direction, "price")
+            "stock" -> Sort.by(direction, "stockQuantity")
+            else -> Sort.by(direction, "createdAt") // 기본값: 생성일시
+        }
     }
 }

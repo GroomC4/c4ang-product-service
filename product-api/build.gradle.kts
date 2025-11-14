@@ -48,6 +48,10 @@ dependencies {
     // Redisson (Redis 클라이언트 with 원자적 연산 지원)
     implementation("org.redisson:redisson-spring-boot-starter:3.24.3")
 
+    // AWS SDK for S3
+    implementation(platform("software.amazon.awssdk:bom:2.20.26"))
+    implementation("software.amazon.awssdk:s3")
+
     // Database
     runtimeOnly("org.postgresql:postgresql")
     implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.3")

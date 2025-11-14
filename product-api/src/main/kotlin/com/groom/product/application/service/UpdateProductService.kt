@@ -9,7 +9,7 @@ import com.groom.product.domain.model.ProductDescription
 import com.groom.product.domain.model.ProductName
 import com.groom.product.domain.model.StockQuantity
 import com.groom.product.domain.model.ThumbnailUrl
-import com.groom.product.infrastructure.repository.ProductPersistenceAdapter
+import com.groom.product.domain.port.LoadProductPort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class UpdateProductService(
-    private val productRepository: ProductPersistenceAdapter,
+    private val loadProductPort: LoadProductPort,
     private val domainEventPublisher: DomainEventPublisher,
 ) {
     @Transactional
@@ -34,9 +34,8 @@ class UpdateProductService(
 
         // 2. 상품 존재 여부 확인
         val product =
-            productRepository
-                .findById(command.productId)
-                .orElseThrow { IllegalArgumentException("Product not found: ${command.productId}") }
+            loadProductPort.loadById(command.productId)
+                ?: throw IllegalArgumentException("Product not found: ${command.productId}")
 
         // 3. 스토어 소유권 검증
         require(product.storeId == command.storeId) {

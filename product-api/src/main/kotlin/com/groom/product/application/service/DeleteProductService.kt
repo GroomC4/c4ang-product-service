@@ -4,7 +4,7 @@ import com.groom.product.common.domain.DomainEventPublisher
 import com.groom.product.application.dto.DeleteProductCommand
 import com.groom.product.application.dto.DeleteProductResult
 import com.groom.product.domain.event.ProductDeletedEvent
-import com.groom.product.infrastructure.repository.ProductPersistenceAdapter
+import com.groom.product.domain.port.LoadProductPort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -15,16 +15,15 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class DeleteProductService(
-    private val productRepository: ProductPersistenceAdapter,
+    private val loadProductPort: LoadProductPort,
     private val domainEventPublisher: DomainEventPublisher,
 ) {
     @Transactional
     fun delete(command: DeleteProductCommand): DeleteProductResult {
         // 1. 상품 존재 여부 확인
         val product =
-            productRepository
-                .findById(command.productId)
-                .orElseThrow { IllegalArgumentException("Product not found: ${command.productId}") }
+            loadProductPort.loadById(command.productId)
+                ?: throw IllegalArgumentException("Product not found: ${command.productId}")
 
         // 2. 스토어 소유권 검증
         require(product.storeId == command.storeId) {

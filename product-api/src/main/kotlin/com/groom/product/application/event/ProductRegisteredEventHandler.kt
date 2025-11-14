@@ -1,8 +1,8 @@
 package com.groom.product.application.event
 
+import com.groom.product.adapter.out.persistence.ProductAuditJpaRepository
 import com.groom.product.domain.event.ProductRegisteredEvent
 import com.groom.product.domain.model.ProductAudit
-import com.groom.product.infrastructure.repository.ProductAuditRepositoryImpl
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -19,7 +19,7 @@ import org.springframework.transaction.event.TransactionalEventListener
  */
 @Component
 class ProductRegisteredEventHandler(
-    private val productAuditRepository: ProductAuditRepositoryImpl,
+    private val productAuditRepository: ProductAuditJpaRepository,
 ) {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)

@@ -1,12 +1,13 @@
-package com.groom.product.infrastructure.repository
+package com.groom.product.adapter.out.persistence
 
 import com.groom.product.domain.model.ProductImage
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.stereotype.Repository
 import java.util.UUID
 
-@Repository
-interface ProductImageRepositoryImpl : JpaRepository<ProductImage, UUID> {
+/**
+ * ProductImage JPA Repository.
+ */
+interface ProductImageJpaRepository : JpaRepository<ProductImage, UUID> {
     fun findByProduct_Id(productId: UUID): List<ProductImage>
 
     fun findByProduct_IdAndImageType(

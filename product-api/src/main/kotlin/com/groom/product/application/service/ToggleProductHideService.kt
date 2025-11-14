@@ -5,7 +5,7 @@ import com.groom.product.application.dto.ToggleProductHideCommand
 import com.groom.product.application.dto.ToggleProductHideResult
 import com.groom.product.domain.event.ProductHiddenEvent
 import com.groom.product.domain.event.ProductRestoredEvent
-import com.groom.product.infrastructure.repository.ProductPersistenceAdapter
+import com.groom.product.domain.port.LoadProductPort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -18,15 +18,14 @@ import java.time.LocalDateTime
  */
 @Service
 class ToggleProductHideService(
-    private val productRepository: ProductPersistenceAdapter,
+    private val loadProductPort: LoadProductPort,
     private val domainEventPublisher: DomainEventPublisher,
 ) {
     @Transactional
     fun toggleHide(command: ToggleProductHideCommand): ToggleProductHideResult {
         val product =
-            productRepository
-                .findById(command.productId)
-                .orElseThrow { IllegalArgumentException("Product not found") }
+            loadProductPort.loadById(command.productId)
+                ?: throw IllegalArgumentException("Product not found")
 
         require(product.storeId == command.storeId) {
             "Product does not belong to this store"

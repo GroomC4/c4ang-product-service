@@ -1,6 +1,6 @@
 package com.groom.product.infrastructure.client
 
-import com.groom.product.common.configuration.properties.GeminiProperties
+import com.groom.product.common.configuration.GeminiProperties
 import feign.RequestInterceptor
 import org.springframework.context.annotation.Bean
 

@@ -1,6 +1,6 @@
 package com.groom.product.infrastructure.adapter
 
-import com.groom.product.common.configuration.aws.S3Properties
+import com.groom.product.common.configuration.S3Properties
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile

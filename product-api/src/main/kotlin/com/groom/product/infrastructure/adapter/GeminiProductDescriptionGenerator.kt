@@ -1,6 +1,6 @@
 package com.groom.product.infrastructure.adapter
 
-import com.groom.product.common.configuration.properties.GeminiProperties
+import com.groom.product.common.configuration.GeminiProperties
 import com.groom.product.domain.port.ProductDescriptionGenerationException
 import com.groom.product.domain.port.ProductDescriptionGenerator
 import com.groom.product.infrastructure.client.GeminiFeignClient

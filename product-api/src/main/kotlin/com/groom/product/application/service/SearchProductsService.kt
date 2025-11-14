@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class SearchProductsService(
-    private val productSearcher: ProductSearcher,
+    private val searchProductsPort: SearchProductsPort,
     private val categoryPathService: CategoryPathService,
 ) {
     /**
@@ -71,7 +71,7 @@ class SearchProductsService(
         val pageable = PageRequest.of(query.page, query.size, sort)
 
         // 3. 검색 실행
-        val productPage = productSearcher.search(spec, pageable)
+        val productPage = searchProductsPort.search(spec, pageable)
 
         // 4. N+1 방지: 모든 카테고리 ID를 수집하여 배치 조회
         val categoryIds = productPage.content.map { product -> product.categoryId }
