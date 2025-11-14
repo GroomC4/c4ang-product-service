@@ -1,4 +1,4 @@
-package com.groom.product.infrastructure.adapter
+package com.groom.product.adapter.out.storage
 
 import com.groom.product.common.configuration.S3Properties
 import io.github.oshai.kotlinlogging.KotlinLogging

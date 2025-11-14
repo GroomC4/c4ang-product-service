@@ -1,7 +1,7 @@
-package com.groom.product.presentation.web
+package com.groom.product.adapter.`in`.web
 
 import com.groom.product.application.service.UploadProductImageService
-import com.groom.product.presentation.web.dto.UploadImageResponse
+import com.groom.product.adapter.`in`.web.dto.UploadImageResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses

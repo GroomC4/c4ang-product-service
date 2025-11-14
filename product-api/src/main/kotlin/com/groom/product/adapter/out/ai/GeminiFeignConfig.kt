@@ -1,4 +1,4 @@
-package com.groom.product.infrastructure.client
+package com.groom.product.adapter.out.ai
 
 import com.groom.product.common.configuration.GeminiProperties
 import feign.RequestInterceptor

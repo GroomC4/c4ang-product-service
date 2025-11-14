@@ -1,4 +1,4 @@
-package com.groom.product.presentation.web.dto
+package com.groom.product.adapter.`in`.web.dto
 
 import com.groom.product.application.dto.RegisterProductCommand
 import io.swagger.v3.oas.annotations.media.Schema

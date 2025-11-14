@@ -1,4 +1,4 @@
-package com.groom.product.infrastructure.repository
+package com.groom.product.adapter.out.persistence
 
 import com.groom.product.domain.model.Product
 import jakarta.persistence.criteria.Predicate

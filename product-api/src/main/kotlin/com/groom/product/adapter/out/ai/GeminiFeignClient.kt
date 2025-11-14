@@ -1,12 +1,12 @@
-package com.groom.product.infrastructure.client
+package com.groom.product.adapter.out.ai
 
-import com.groom.product.infrastructure.adapter.GeminiProductDescriptionGenerator.Candidate
-import com.groom.product.infrastructure.adapter.GeminiProductDescriptionGenerator.Content
-import com.groom.product.infrastructure.adapter.GeminiProductDescriptionGenerator.GeminiRequest
-import com.groom.product.infrastructure.adapter.GeminiProductDescriptionGenerator.GeminiResponse
-import com.groom.product.infrastructure.adapter.GeminiProductDescriptionGenerator.GenerationConfig
-import com.groom.product.infrastructure.adapter.GeminiProductDescriptionGenerator.Part
-import com.groom.product.infrastructure.adapter.GeminiProductDescriptionGenerator.SystemInstruction
+import com.groom.product.adapter.out.ai.GeminiProductDescriptionGenerator.Candidate
+import com.groom.product.adapter.out.ai.GeminiProductDescriptionGenerator.Content
+import com.groom.product.adapter.out.ai.GeminiProductDescriptionGenerator.GeminiRequest
+import com.groom.product.adapter.out.ai.GeminiProductDescriptionGenerator.GeminiResponse
+import com.groom.product.adapter.out.ai.GeminiProductDescriptionGenerator.GenerationConfig
+import com.groom.product.adapter.out.ai.GeminiProductDescriptionGenerator.Part
+import com.groom.product.adapter.out.ai.GeminiProductDescriptionGenerator.SystemInstruction
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
