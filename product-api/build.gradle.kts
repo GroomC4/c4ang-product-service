@@ -8,10 +8,12 @@ plugins {
 
 // 버전 변수 참조 (루트 프로젝트에서 정의)
 val platformCoreVersion: String by rootProject.extra
-val testcontainersVersion: String by rootProject.extra
 
 dependencies {
-    // Platform Core - Test only (datasource configuration included)
+    // Platform Core - Production (datasource configuration)
+    implementation("com.groom.platform:datasource-starter:$platformCoreVersion")
+
+    // Platform Core - Test only (testcontainers configuration)
     testImplementation("com.groom.platform:testcontainers-starter:$platformCoreVersion")
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -59,11 +61,6 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
     testImplementation("io.mockk:mockk:1.14.5")
-
-    // K3s Module (platform-core에서 제공하지 않는 추가 모듈)
-    testImplementation("org.testcontainers:k3s:$testcontainersVersion")
-    testImplementation("io.fabric8:kubernetes-client:6.10.0")
-    testImplementation("org.bouncycastle:bcpkix-jdk18on:1.78")
 }
 
 // 모든 Test 태스크에 공통 설정 적용

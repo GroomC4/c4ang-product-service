@@ -1,15 +1,8 @@
 spring:
-  main:
-    allow-bean-definition-overriding: true
   autoconfigure:
     exclude:
+      # Redis 사용하지 않으므로 Redisson 자동 설정 비활성화
       - org.redisson.spring.starter.RedissonAutoConfigurationV2
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    producer:
-      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    consumer:
-      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
   jpa:
     hibernate:
       ddl-auto: none
@@ -17,18 +10,10 @@ spring:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
 
-# Platform Core Testcontainers 설정
-testcontainers:
-  postgres:
-    enabled: true
-    replica-enabled: true
-    schema-location: classpath:sql/schema.sql
-  redis:
-    enabled: true
-  kafka:
-    enabled: true
-  schema-registry:
-    enabled: true
+# Testcontainers 설정은 IntegrationTestBase에서 처리
+# - PostgreSQL Primary/Replica, Redis, Kafka, Schema Registry 자동 시작
+# - 스키마 파일 자동 로딩
+# - Kafka 동적 포트 자동 설정
 
 logging:
   level:

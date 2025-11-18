@@ -1,6 +1,6 @@
 package com.groom.product.adapter.`in`.web
 
-import com.groom.product.common.annotation.IntegrationTest
+import com.groom.product.common.IntegrationTestBase
 import com.groom.product.common.config.NoOpEventPublisherConfig
 import com.groom.product.common.config.TestAwsConfig
 import com.groom.product.common.config.TestGeminiConfig
@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.jdbc.Sql
@@ -21,8 +20,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
-@IntegrationTest
-@SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @Import(NoOpEventPublisherConfig::class, TestAwsConfig::class, TestGeminiConfig::class)
@@ -42,7 +39,7 @@ import java.util.UUID
     ),
 )
 @DisplayName("상품 조회(Query) 컨트롤러 통합 테스트")
-class ProductQueryControllerIntegrationTest {
+class ProductQueryControllerIntegrationTest : IntegrationTestBase() {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
