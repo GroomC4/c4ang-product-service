@@ -45,5 +45,5 @@ subprojects {
 }
 
 tasks.register("bootRun") {
-    dependsOn(":store-api:bootRun")
+    dependsOn(":product-api:bootRun")
 }

@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: store-api
+    name: product-api
   jpa:
     hibernate:
       ddl-auto: none

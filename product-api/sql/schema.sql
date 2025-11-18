@@ -138,6 +138,29 @@ COMMENT ON COLUMN p_product_audit.change_summary IS '변경 사항 요약 설명
 COMMENT ON COLUMN p_product_audit.recorded_at IS '감사 이벤트 기록 시각.';
 COMMENT ON COLUMN p_product_audit.metadata IS '추가 정보를 담은 JSON 메타데이터.';
 
+CREATE TABLE IF NOT EXISTS p_ai_prompt_audit (
+    id                UUID PRIMARY KEY,
+    user_id           UUID,
+    prompt            TEXT NOT NULL,
+    response          TEXT,
+    model             TEXT,
+    success           BOOLEAN NOT NULL DEFAULT false,
+    error_message     TEXT,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    metadata          JSONB
+);
+
+COMMENT ON TABLE p_ai_prompt_audit IS 'AI API 요청 질문과 응답을 모두 저장하는 감사 로그.';
+COMMENT ON COLUMN p_ai_prompt_audit.id IS 'AI 프롬프트 감사 레코드의 UUID 기본 키.';
+COMMENT ON COLUMN p_ai_prompt_audit.user_id IS '요청한 사용자 UUID (nullable).';
+COMMENT ON COLUMN p_ai_prompt_audit.prompt IS 'AI에게 전송한 프롬프트 내용.';
+COMMENT ON COLUMN p_ai_prompt_audit.response IS 'AI로부터 받은 응답 내용.';
+COMMENT ON COLUMN p_ai_prompt_audit.model IS '사용된 AI 모델명 (예: gemini-pro).';
+COMMENT ON COLUMN p_ai_prompt_audit.success IS 'API 호출 성공 여부.';
+COMMENT ON COLUMN p_ai_prompt_audit.error_message IS '실패 시 에러 메시지.';
+COMMENT ON COLUMN p_ai_prompt_audit.created_at IS '프롬프트 요청 시각.';
+COMMENT ON COLUMN p_ai_prompt_audit.metadata IS '추가 정보를 담은 JSON 메타데이터.';
+
 CREATE INDEX IF NOT EXISTS idx_p_product_category_parent ON p_product_category (parent_category_id);
 CREATE INDEX IF NOT EXISTS idx_p_product_store ON p_product (store_id);
 CREATE INDEX IF NOT EXISTS idx_p_product_category ON p_product (category_id);

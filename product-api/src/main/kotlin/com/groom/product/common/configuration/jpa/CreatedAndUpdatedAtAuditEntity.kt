@@ -23,12 +23,12 @@ abstract class CreatedAndUpdatedAtAuditEntity {
     val id: UUID = UUID.randomUUID()
 
     @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     var createdAt: LocalDateTime = LocalDateTime.now()
         protected set
 
     @LastModifiedDate
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now()
         protected set
 
