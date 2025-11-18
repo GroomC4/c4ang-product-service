@@ -1,4 +1,4 @@
-package com.groom.product.common.configuration
+package com.groom.product.configuration.properties
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration

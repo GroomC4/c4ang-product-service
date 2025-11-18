@@ -1,6 +1,8 @@
 spring:
   autoconfigure:
     exclude:
+      # Platform Core의 커스텀 DataSource를 사용하므로 Spring Boot 기본 자동 설정 비활성화
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
       # Redis 사용하지 않으므로 Redisson 자동 설정 비활성화
       - org.redisson.spring.starter.RedissonAutoConfigurationV2
   jpa:
@@ -21,7 +23,6 @@ logging:
     org.springframework.jdbc: DEBUG
     org.springframework.jdbc.datasource.init: DEBUG
     org.postgresql: DEBUG
-    com.groom.ecommerce: DEBUG
     com.groom.product: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE

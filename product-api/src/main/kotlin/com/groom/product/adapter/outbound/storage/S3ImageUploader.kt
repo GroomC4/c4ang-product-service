@@ -1,6 +1,6 @@
-package com.groom.product.adapter.out.storage
+package com.groom.product.adapter.outbound.storage
 
-import com.groom.product.common.configuration.S3Properties
+import com.groom.product.configuration.properties.S3Properties
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile

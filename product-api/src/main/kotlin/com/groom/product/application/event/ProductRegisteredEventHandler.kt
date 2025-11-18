@@ -1,6 +1,6 @@
 package com.groom.product.application.event
 
-import com.groom.product.adapter.out.persistence.ProductAuditJpaRepository
+import com.groom.product.adapter.outbound.persistence.ProductAuditJpaRepository
 import com.groom.product.domain.event.ProductRegisteredEvent
 import com.groom.product.domain.model.ProductAudit
 import org.springframework.stereotype.Component

@@ -1,4 +1,4 @@
-package com.groom.product.adapter.out.persistence
+package com.groom.product.adapter.outbound.persistence
 
 import com.groom.product.domain.model.ProductCategory
 import com.groom.product.domain.port.LoadCategoryPort

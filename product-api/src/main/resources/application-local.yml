@@ -12,6 +12,11 @@ spring:
       driver-class-name: org.postgresql.Driver
       hikari:
         maximum-pool-size: 5
+
+# Platform Core DataSource 라우팅 설정
+platform:
+  datasource:
+    replica-enabled: true
   jpa:
     hibernate:
       ddl-auto: none
@@ -30,12 +35,11 @@ spring:
 logging:
   level:
     # 프로젝트 패키지 - DEBUG 레벨 (상세 개발 로그)
-    com.groom.ecommerce: DEBUG
+    com.groom.product: DEBUG
 
     # Spring Framework
     org.springframework: INFO
     org.springframework.web: DEBUG  # HTTP 요청/응답 디버깅
-    org.springframework.security: DEBUG  # 인증/인가 디버깅
 
     # Hibernate/JPA - SQL 쿼리 디버깅
     org.hibernate: INFO
@@ -45,34 +49,3 @@ logging:
 
   file:
     path: ./logs
-
-security:
-  jwt:
-    secret: local-development-secret-please-change
-    issuer: ecommerce-service-api
-    accessTokenExpirationMinutes: 60
-    refreshTokenExpirationDays: 3
-
-feign:
-  clients:
-    store-service:
-      url: http://localhost:8082
-      connect-timeout: 10000
-      read-timeout: 10000
-      logger-level: full
-  client:
-    config:
-      store-service:
-        loggerLevel: full
-
-# Kafka Producer 설정 (로컬 개발 환경)
-kafka:
-  bootstrap-servers: localhost:9092
-  producer:
-    acks: all
-    retries: 3
-  schema-registry:
-    url: http://localhost:8081
-  topics:
-    store-info-updated: store.info.updated
-    store-deleted: store.deleted

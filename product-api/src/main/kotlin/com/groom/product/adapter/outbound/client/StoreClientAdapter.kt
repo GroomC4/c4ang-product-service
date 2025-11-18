@@ -1,4 +1,4 @@
-package com.groom.product.adapter.out.client
+package com.groom.product.adapter.outbound.client
 
 import com.groom.product.domain.model.StoreInfo
 import com.groom.product.domain.port.LoadStorePort

@@ -1,17 +1,22 @@
 spring:
   datasource:
     master:
-      url: jdbc:postgresql://localhost:15432/groom
-      username: application
-      password: application
+      url: jdbc:postgresql://${DB_MASTER_HOST:c4-app-db.cfkm648uqlug.ap-northeast-2.rds.amazonaws.com:5432}/product_db
+      username: ${DB_USERNAME:application}
+      password: ${DB_PASSWORD:application}
       driver-class-name: org.postgresql.Driver
     replica:
-      url: jdbc:postgresql://localhost:15433/groom
-      username: application
-      password: application
+      url: jdbc:postgresql://${DB_REPLICA_HOST:c4-app-db.cfkm648uqlug.ap-northeast-2.rds.amazonaws.com:5432}/product_db
+      username: ${DB_USERNAME:application}
+      password: ${DB_PASSWORD:application}
       driver-class-name: org.postgresql.Driver
       hikari:
         maximum-pool-size: 5
+
+# Platform Core DataSource 라우팅 설정
+platform:
+  datasource:
+    replica-enabled: true
   jpa:
     hibernate:
       ddl-auto: none
@@ -33,7 +38,7 @@ logging:
     root: WARN
 
     # 프로젝트 패키지 - INFO 레벨 (비즈니스 로직 추적)
-    com.groom.ecommerce: INFO
+    com.groom.product: INFO
 
     # Spring Framework - WARN (필수 로그만)
     org.springframework: WARN

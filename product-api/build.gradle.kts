@@ -4,6 +4,8 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.spring")
     kotlin("plugin.jpa")
+    id("org.springframework.cloud.contract") version "4.1.4"
+    `maven-publish`
 }
 
 // 버전 변수 참조 (루트 프로젝트에서 정의)

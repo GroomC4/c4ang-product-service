@@ -2,6 +2,7 @@ package com.groom.product.common
 
 import com.groom.platform.testcontainers.annotation.IntegrationTest
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 
 /**
  * ⚠️ 통합 테스트 베이스 클래스
@@ -42,4 +43,5 @@ import org.springframework.boot.test.context.SpringBootTest
         "testcontainers.schema-registry.enabled=true",
     ],
 )
+@ActiveProfiles("test")
 abstract class IntegrationTestBase

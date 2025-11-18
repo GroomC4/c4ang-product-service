@@ -78,7 +78,7 @@
         </root>
 
         <!-- 프로젝트 패키지 DEBUG (개발 중 상세 로그) -->
-        <logger name="com.groom.store" level="DEBUG" additivity="false">
+        <logger name="com.groom.product" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="ASYNC_FILE"/>
         </logger>
@@ -104,7 +104,7 @@
         </root>
 
         <!-- 프로젝트 패키지 DEBUG -->
-        <logger name="com.groom.store" level="DEBUG"/>
+        <logger name="com.groom.product" level="DEBUG"/>
 
         <!-- 외부 라이브러리 INFO -->
         <logger name="org.springframework" level="INFO"/>
@@ -121,7 +121,7 @@
         </root>
 
         <!-- 프로젝트 패키지 INFO -->
-        <logger name="com.groom.store" level="INFO"/>
+        <logger name="com.groom.product" level="INFO"/>
 
         <!-- 외부 라이브러리 WARN -->
         <logger name="org.springframework" level="WARN"/>
@@ -137,7 +137,7 @@
         </root>
 
         <!-- 프로젝트 패키지 INFO -->
-        <logger name="com.groom.store" level="INFO"/>
+        <logger name="com.groom.product" level="INFO"/>
 
         <!-- 외부 라이브러리 WARN -->
         <logger name="org.springframework" level="WARN"/>
@@ -153,7 +153,7 @@
         </root>
 
         <!-- 프로젝트 패키지 INFO (비즈니스 로직 추적) -->
-        <logger name="com.groom.store" level="INFO" additivity="false">
+        <logger name="com.groom.product" level="INFO" additivity="false">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="ASYNC_FILE"/>
             <appender-ref ref="ASYNC_ERROR_FILE"/>

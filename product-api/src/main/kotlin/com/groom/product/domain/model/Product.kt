@@ -1,6 +1,6 @@
 package com.groom.product.domain.model
 
-import com.groom.product.common.configuration.jpa.CreatedAndUpdatedAtAuditEntity
+import com.groom.product.configuration.jpa.CreatedAndUpdatedAtAuditEntity
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -18,6 +18,8 @@ import java.util.UUID
 @Entity
 @Table(name = "p_product")
 class Product(
+    @Id
+    val id: UUID = UUID.randomUUID(),
     @Column(nullable = false)
     val storeId: UUID,
     @Column(nullable = false)

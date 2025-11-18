@@ -1,7 +1,7 @@
 package com.groom.product.application.service
 
 import com.groom.product.domain.service.ImageUploadPolicy
-import com.groom.product.adapter.out.storage.S3ImageUploader
+import com.groom.product.adapter.outbound.storage.S3ImageUploader
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile

@@ -1,6 +1,6 @@
 package com.groom.product.domain.model
 
-import com.groom.product.common.configuration.jpa.CreatedAndUpdatedAtAuditEntity
+import com.groom.product.configuration.jpa.CreatedAndUpdatedAtAuditEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -15,6 +15,8 @@ import java.util.UUID
 @Entity
 @Table(name = "p_product_category")
 class ProductCategory(
+    @Id
+    val id: UUID = UUID.randomUUID(),
     @Column(nullable = false)
     val name: String,
     @Column
