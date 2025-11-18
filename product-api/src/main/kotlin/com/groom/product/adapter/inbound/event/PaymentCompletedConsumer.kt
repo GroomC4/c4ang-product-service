@@ -1,0 +1,166 @@
+package com.groom.product.adapter.inbound.event
+
+import com.groom.ecommerce.order.event.avro.ConfirmedOrderItem
+import com.groom.ecommerce.order.event.avro.StockConfirmed
+import com.groom.ecommerce.payment.event.avro.PaymentCompleted
+import com.groom.ecommerce.saga.event.avro.StockConfirmationFailed
+import com.groom.product.adapter.outbound.persistence.ProcessedEventRepository
+import com.groom.product.domain.model.ProcessedEvent
+import com.groom.product.domain.service.StockReservationService
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.Acknowledgment
+import org.springframework.kafka.support.KafkaHeaders
+import org.springframework.messaging.handler.annotation.Header
+import org.springframework.messaging.handler.annotation.Payload
+import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
+import java.util.UUID
+
+private val logger = KotlinLogging.logger {}
+
+/**
+ * PaymentCompleted 이벤트 Consumer
+ *
+ * Payment Service에서 발행된 결제 완료 이벤트를 소비하여
+ * 예약된 재고를 확정합니다 (Redis → DB 영구 저장).
+ *
+ * Topic: payment.completed
+ * Event Schema: PaymentCompleted.avsc
+ *
+ * Success: stock.confirmed 이벤트 발행
+ * Failure: stock.confirmation.failed 이벤트 발행
+ */
+@Component
+class PaymentCompletedConsumer(
+    private val stockService: StockReservationService,
+    private val kafkaTemplate: KafkaTemplate<String, Any>,
+    private val processedEventRepository: ProcessedEventRepository,
+) {
+    @KafkaListener(
+        topics = ["payment.completed"],
+        groupId = "product-service",
+        containerFactory = "kafkaListenerContainerFactory",
+    )
+    @Transactional
+    fun consume(
+        @Payload event: PaymentCompleted,
+        @Header(KafkaHeaders.RECEIVED_KEY) key: String,
+        acknowledgment: Acknowledgment,
+    ) {
+        val eventId = event.eventId.toString()
+        val orderId = UUID.fromString(event.orderId.toString())
+        val paymentId = event.paymentId.toString()
+
+        logger.info { "📨 Received payment.completed event - eventId: $eventId, orderId: $orderId, paymentId: $paymentId" }
+
+        // 멱등성 체크: 이미 처리된 이벤트인지 확인
+        if (processedEventRepository.existsByEventId(eventId)) {
+            logger.warn { "⚠️  Event already processed - eventId: $eventId. Skipping." }
+            acknowledgment.acknowledge()
+            return
+        }
+
+        try {
+            // NOTE: PaymentCompleted 이벤트에는 상품 아이템 정보가 없으므로
+            // Order Service와의 동기화를 위해 별도 조회가 필요할 수 있습니다.
+            // 여기서는 간단히 Redis 예약 정보를 기반으로 처리합니다.
+            // 실제 구현에서는 p_stock_reservation_log 테이블을 조회하거나
+            // Order Service API를 호출하여 주문 상품 정보를 가져와야 합니다.
+
+            // TODO: 주문 상품 정보 조회 로직 추가 필요
+            // 임시로 빈 리스트 사용 (실제로는 주문 정보에서 가져와야 함)
+            val items = emptyList<StockReservationService.OrderItem>()
+
+            // 재고 확정 (Redis → DB)
+            val success = stockService.confirmStock(orderId, items)
+
+            if (success) {
+                logger.info { "✅ Stock confirmation successful for orderId: $orderId" }
+
+                // stock.confirmed 이벤트 발행
+                publishStockConfirmed(orderId, paymentId, items)
+            } else {
+                logger.warn { "⚠️  Stock confirmation failed for orderId: $orderId" }
+
+                // stock.confirmation.failed 이벤트 발행
+                publishStockConfirmationFailed(orderId, paymentId, "재고 확정 실패")
+            }
+
+            // 처리 완료 기록
+            processedEventRepository.save(
+                ProcessedEvent(
+                    eventId = eventId,
+                    eventType = "payment.completed",
+                ),
+            )
+
+            // Kafka manual commit
+            acknowledgment.acknowledge()
+        } catch (e: Exception) {
+            logger.error(e) { "❌ Failed to process payment.completed event - eventId: $eventId" }
+            throw e // 재처리를 위해 예외 던지기
+        }
+    }
+
+    private fun publishStockConfirmed(
+        orderId: UUID,
+        paymentId: String,
+        items: List<StockReservationService.OrderItem>,
+    ) {
+        val event =
+            StockConfirmed
+                .newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventTimestamp(Instant.now().toEpochMilli())
+                .setOrderId(orderId.toString())
+                .setPaymentId(paymentId)
+                .setConfirmedItems(
+                    items.map { item ->
+                        ConfirmedOrderItem
+                            .newBuilder()
+                            .setProductId(item.productId.toString())
+                            .setQuantity(item.quantity)
+                            .build()
+                    },
+                ).setConfirmedAt(Instant.now().toEpochMilli())
+                .build()
+
+        kafkaTemplate.send("stock.confirmed", orderId.toString(), event)
+            .whenComplete { result, ex ->
+                if (ex == null) {
+                    logger.info { "✅ Published stock.confirmed event - orderId: $orderId, offset: ${result?.recordMetadata?.offset()}" }
+                } else {
+                    logger.error(ex) { "❌ Failed to publish stock.confirmed event - orderId: $orderId" }
+                }
+            }
+    }
+
+    private fun publishStockConfirmationFailed(
+        orderId: UUID,
+        paymentId: String,
+        reason: String,
+    ) {
+        val event =
+            StockConfirmationFailed
+                .newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventTimestamp(Instant.now().toEpochMilli())
+                .setOrderId(orderId.toString())
+                .setPaymentId(paymentId)
+                .setFailureReason(reason)
+                .setFailedAt(Instant.now().toEpochMilli())
+                .build()
+
+        kafkaTemplate.send("stock.confirmation.failed", orderId.toString(), event)
+            .whenComplete { result, ex ->
+                if (ex == null) {
+                    logger.info { "✅ Published stock.confirmation.failed event - orderId: $orderId, offset: ${result?.recordMetadata?.offset()}" }
+                } else {
+                    logger.error(ex) { "❌ Failed to publish stock.confirmation.failed event - orderId: $orderId" }
+                }
+            }
+    }
+}

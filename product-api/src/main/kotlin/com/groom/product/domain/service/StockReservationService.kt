@@ -1,0 +1,204 @@
+package com.groom.product.domain.service
+
+import com.groom.product.adapter.outbound.persistence.ProductJpaRepository
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.redisson.api.RedissonClient
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
+import java.util.concurrent.TimeUnit
+
+private val logger = KotlinLogging.logger {}
+
+/**
+ * 재고 예약 도메인 서비스
+ *
+ * Redis를 사용하여 원자적 재고 예약을 수행합니다.
+ * - Redis Atomic Operations를 통한 동시성 제어
+ * - DB 재고 차감은 결제 완료 시 수행 (재고 확정)
+ */
+@Service
+class StockReservationService(
+    private val redissonClient: RedissonClient,
+    private val productRepository: ProductJpaRepository,
+) {
+    /**
+     * 주문 상품들의 재고를 예약합니다.
+     *
+     * @param orderId 주문 ID
+     * @param items 주문 아이템 리스트 (productId, quantity)
+     * @param ttlMinutes 예약 만료 시간 (기본 15분)
+     * @return 성공 시 예약된 아이템 정보, 실패 시 null
+     */
+    @Transactional(readOnly = true)
+    fun reserveStock(
+        orderId: UUID,
+        items: List<OrderItem>,
+        ttlMinutes: Long = 15,
+    ): ReservationResult {
+        logger.info { "📦 Attempting to reserve stock for orderId: $orderId, items: $items" }
+
+        // 1. DB에서 상품 재고 확인
+        val productIds = items.map { it.productId }
+        val products = productRepository.findAllById(productIds)
+
+        if (products.size != items.size) {
+            val foundIds = products.map { it.id }.toSet()
+            val missingIds = productIds.filterNot { it in foundIds }
+            logger.warn { "⚠️  Products not found: $missingIds" }
+            return ReservationResult.Failure(
+                failedItems = items.filter { it.productId in missingIds },
+                reason = "상품을 찾을 수 없습니다",
+            )
+        }
+
+        // 2. Redis에서 원자적으로 재고 예약
+        val reservedItems = mutableListOf<ReservedItem>()
+        val failedItems = mutableListOf<FailedItem>()
+
+        for (item in items) {
+            val product = products.first { it.id == item.productId }
+            val stockKey = "stock:${item.productId}"
+            val reservationKey = "stock:reservation:$orderId:${item.productId}"
+
+            // Redis에서 현재 재고 확인 (없으면 DB 값으로 초기화)
+            val atomicLong = redissonClient.getAtomicLong(stockKey)
+            if (!atomicLong.isExists) {
+                atomicLong.set(product.stockQuantity.toLong())
+            }
+
+            // 원자적 재고 차감
+            val remainingStock = atomicLong.addAndGet(-item.quantity.toLong())
+
+            if (remainingStock < 0) {
+                // 재고 부족 - 롤백
+                atomicLong.addAndGet(item.quantity.toLong())
+                logger.warn { "⚠️  Insufficient stock for product ${item.productId}: requested=${item.quantity}, available=${remainingStock + item.quantity}" }
+
+                failedItems.add(
+                    FailedItem(
+                        productId = item.productId,
+                        requestedQuantity = item.quantity,
+                        availableStock = (remainingStock + item.quantity).toInt(),
+                    ),
+                )
+                // 하나라도 실패하면 전체 롤백
+                break
+            } else {
+                // 성공 - 예약 정보 저장
+                val reservationBucket = redissonClient.getBucket<Int>(reservationKey)
+                reservationBucket.set(item.quantity, ttlMinutes, TimeUnit.MINUTES)
+
+                reservedItems.add(
+                    ReservedItem(
+                        productId = item.productId,
+                        quantity = item.quantity,
+                        reservedStock = remainingStock.toInt(),
+                    ),
+                )
+            }
+        }
+
+        // 3. 실패 시 전체 롤백
+        if (failedItems.isNotEmpty()) {
+            rollbackReservation(orderId, reservedItems)
+            return ReservationResult.Failure(
+                failedItems = failedItems,
+                reason = "재고 부족",
+            )
+        }
+
+        logger.info { "✅ Stock reserved successfully for orderId: $orderId, reservedItems: $reservedItems" }
+        return ReservationResult.Success(reservedItems)
+    }
+
+    /**
+     * 재고 예약을 확정합니다 (결제 완료 시).
+     *
+     * Redis의 임시 예약을 제거하고, DB에서 실제 재고를 차감합니다.
+     *
+     * @param orderId 주문 ID
+     * @param items 확정할 아이템 리스트
+     */
+    @Transactional
+    fun confirmStock(
+        orderId: UUID,
+        items: List<OrderItem>,
+    ): Boolean {
+        logger.info { "📦 Confirming stock for orderId: $orderId, items: $items" }
+
+        try {
+            for (item in items) {
+                val product =
+                    productRepository.findById(item.productId).orElseThrow {
+                        IllegalArgumentException("Product not found: ${item.productId}")
+                    }
+
+                // DB 재고 차감
+                val newStock = product.stockQuantity - item.quantity
+                if (newStock < 0) {
+                    logger.error { "❌ DB stock became negative for product ${item.productId}: current=${product.stockQuantity}, requested=${item.quantity}" }
+                    return false
+                }
+
+                product.stockQuantity = newStock
+                productRepository.save(product)
+
+                // Redis 예약 정보 삭제
+                val reservationKey = "stock:reservation:$orderId:${item.productId}"
+                redissonClient.getBucket<Int>(reservationKey).delete()
+            }
+
+            logger.info { "✅ Stock confirmed for orderId: $orderId" }
+            return true
+        } catch (e: Exception) {
+            logger.error(e) { "❌ Failed to confirm stock for orderId: $orderId" }
+            return false
+        }
+    }
+
+    /**
+     * 재고 예약을 롤백합니다.
+     *
+     * @param orderId 주문 ID
+     * @param reservedItems 롤백할 아이템 리스트
+     */
+    private fun rollbackReservation(
+        orderId: UUID,
+        reservedItems: List<ReservedItem>,
+    ) {
+        logger.warn { "🔄 Rolling back stock reservation for orderId: $orderId" }
+
+        for (item in reservedItems) {
+            val stockKey = "stock:${item.productId}"
+            val atomicLong = redissonClient.getAtomicLong(stockKey)
+            atomicLong.addAndGet(item.quantity.toLong())
+
+            val reservationKey = "stock:reservation:$orderId:${item.productId}"
+            redissonClient.getBucket<Int>(reservationKey).delete()
+        }
+    }
+
+    data class OrderItem(
+        val productId: UUID,
+        val quantity: Int,
+    )
+
+    data class ReservedItem(
+        val productId: UUID,
+        val quantity: Int,
+        val reservedStock: Int,
+    )
+
+    data class FailedItem(
+        val productId: UUID,
+        val requestedQuantity: Int,
+        val availableStock: Int,
+    )
+
+    sealed class ReservationResult {
+        data class Success(val reservedItems: List<ReservedItem>) : ReservationResult()
+
+        data class Failure(val failedItems: List<FailedItem>, val reason: String) : ReservationResult()
+    }
+}
