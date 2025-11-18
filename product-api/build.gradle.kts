@@ -56,16 +56,11 @@ dependencies {
 
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
-    testImplementation("org.testcontainers:kafka:$testcontainersVersion")
-    testImplementation("org.testcontainers:testcontainers:$testcontainersVersion")
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
     testImplementation("io.mockk:mockk:1.14.5")
 
-    // K3s Module 추가
+    // K3s Module (platform-core에서 제공하지 않는 추가 모듈)
     testImplementation("org.testcontainers:k3s:$testcontainersVersion")
     testImplementation("io.fabric8:kubernetes-client:6.10.0")
     testImplementation("org.bouncycastle:bcpkix-jdk18on:1.78")

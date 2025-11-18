@@ -1,5 +1,6 @@
 package com.groom.product.adapter.`in`.web
 
+import com.groom.product.common.TransactionApplier
 import com.groom.product.common.annotation.IntegrationTest
 import com.groom.product.common.config.NoOpEventPublisherConfig
 import com.groom.product.common.config.TestAwsConfig
@@ -43,6 +44,9 @@ import java.util.UUID
 class ProductQueryControllerIntegrationTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
+
+    @Autowired
+    private lateinit var transactionApplier: TransactionApplier
 
     companion object {
         // Test Users

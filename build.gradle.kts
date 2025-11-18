@@ -11,7 +11,7 @@ plugins {
 }
 
 // 버전 관리
-extra["platformCoreVersion"] = "1.2.2-RC1"
+extra["platformCoreVersion"] = "1.2.2-RC4"
 extra["testcontainersVersion"] = "1.19.7"
 
 allprojects {
