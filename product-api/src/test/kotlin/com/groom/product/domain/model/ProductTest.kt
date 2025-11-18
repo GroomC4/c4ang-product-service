@@ -351,4 +351,120 @@ class ProductTest :
             // when & then
             product1 shouldNotBe product2
         }
+
+        test("decreaseStock()으로 재고를 차감하면 재고가 감소한다") {
+            // given
+            val product =
+                Product(
+                    storeId = UUID.randomUUID(),
+                    storeName = "테스트 스토어",
+                    categoryId = UUID.randomUUID(),
+                    name = "테스트 상품",
+                    price = BigDecimal("10000"),
+                    stockQuantity = 100,
+                )
+
+            // when
+            val remainingStock = product.decreaseStock(30)
+
+            // then
+            remainingStock shouldBe 70
+            product.stockQuantity shouldBe 70
+        }
+
+        test("decreaseStock()으로 재고보다 많은 수량을 차감하면 예외가 발생한다") {
+            // given
+            val product =
+                Product(
+                    storeId = UUID.randomUUID(),
+                    storeName = "테스트 스토어",
+                    categoryId = UUID.randomUUID(),
+                    name = "테스트 상품",
+                    price = BigDecimal("10000"),
+                    stockQuantity = 100,
+                )
+
+            // when & then
+            shouldThrow<IllegalArgumentException> {
+                product.decreaseStock(150)
+            }
+        }
+
+        test("decreaseStock()으로 음수 수량을 차감하면 예외가 발생한다") {
+            // given
+            val product =
+                Product(
+                    storeId = UUID.randomUUID(),
+                    storeName = "테스트 스토어",
+                    categoryId = UUID.randomUUID(),
+                    name = "테스트 상품",
+                    price = BigDecimal("10000"),
+                    stockQuantity = 100,
+                )
+
+            // when & then
+            shouldThrow<IllegalArgumentException> {
+                product.decreaseStock(-10)
+            }
+        }
+
+        test("increaseStock()으로 재고를 증가시키면 재고가 증가한다") {
+            // given
+            val product =
+                Product(
+                    storeId = UUID.randomUUID(),
+                    storeName = "테스트 스토어",
+                    categoryId = UUID.randomUUID(),
+                    name = "테스트 상품",
+                    price = BigDecimal("10000"),
+                    stockQuantity = 100,
+                )
+
+            // when
+            val newStock = product.increaseStock(50)
+
+            // then
+            newStock shouldBe 150
+            product.stockQuantity shouldBe 150
+        }
+
+        test("increaseStock()으로 음수 수량을 증가시키면 예외가 발생한다") {
+            // given
+            val product =
+                Product(
+                    storeId = UUID.randomUUID(),
+                    storeName = "테스트 스토어",
+                    categoryId = UUID.randomUUID(),
+                    name = "테스트 상품",
+                    price = BigDecimal("10000"),
+                    stockQuantity = 100,
+                )
+
+            // when & then
+            shouldThrow<IllegalArgumentException> {
+                product.increaseStock(-10)
+            }
+        }
+
+        test("decreaseStock()과 increaseStock()을 조합하여 재고를 관리할 수 있다") {
+            // given
+            val product =
+                Product(
+                    storeId = UUID.randomUUID(),
+                    storeName = "테스트 스토어",
+                    categoryId = UUID.randomUUID(),
+                    name = "테스트 상품",
+                    price = BigDecimal("10000"),
+                    stockQuantity = 100,
+                )
+
+            // when
+            product.decreaseStock(30) // 100 - 30 = 70
+            product.increaseStock(20) // 70 + 20 = 90
+            val finalStock = product.decreaseStock(10) // 90 - 10 = 80
+
+            // then
+            finalStock shouldBe 80
+            product.stockQuantity shouldBe 80
+        }
     })
