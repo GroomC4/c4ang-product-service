@@ -11,10 +11,7 @@ val platformCoreVersion: String by rootProject.extra
 val testcontainersVersion: String by rootProject.extra
 
 dependencies {
-    // Platform Core - Production
-    implementation("com.groom.platform:datasource-starter:$platformCoreVersion")
-
-    // Platform Core - Test
+    // Platform Core - Test only (datasource configuration included)
     testImplementation("com.groom.platform:testcontainers-starter:$platformCoreVersion")
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
