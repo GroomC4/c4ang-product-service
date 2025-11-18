@@ -47,7 +47,16 @@ class StockReservationService(
             val missingIds = productIds.filterNot { it in foundIds }
             logger.warn { "⚠️  Products not found: $missingIds" }
             return ReservationResult.Failure(
-                failedItems = items.filter { it.productId in missingIds },
+                failedItems =
+                    items
+                        .filter { it.productId in missingIds }
+                        .map {
+                            FailedItem(
+                                productId = it.productId,
+                                requestedQuantity = it.quantity,
+                                availableStock = 0,
+                            )
+                        },
                 reason = "상품을 찾을 수 없습니다",
             )
         }
@@ -135,14 +144,13 @@ class StockReservationService(
                     }
 
                 // DB 재고 차감
-                val newStock = product.stockQuantity - item.quantity
-                if (newStock < 0) {
-                    logger.error { "❌ DB stock became negative for product ${item.productId}: current=${product.stockQuantity}, requested=${item.quantity}" }
+                try {
+                    product.decreaseStock(item.quantity)
+                    productRepository.save(product)
+                } catch (e: IllegalArgumentException) {
+                    logger.error { "❌ DB stock became negative for product ${item.productId}: ${e.message}" }
                     return false
                 }
-
-                product.stockQuantity = newStock
-                productRepository.save(product)
 
                 // Redis 예약 정보 삭제
                 val reservationKey = "stock:reservation:$orderId:${item.productId}"

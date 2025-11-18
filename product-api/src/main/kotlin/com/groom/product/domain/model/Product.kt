@@ -111,6 +111,33 @@ class Product(
     }
 
     /**
+     * 재고를 차감합니다.
+     *
+     * @param quantity 차감할 수량
+     * @return 차감 후 남은 재고 수량
+     * @throws IllegalArgumentException 재고가 부족한 경우
+     */
+    fun decreaseStock(quantity: Int): Int {
+        require(quantity > 0) { "Quantity must be positive" }
+        val newStock = this.stockQuantity - quantity
+        require(newStock >= 0) { "Insufficient stock: requested=$quantity, available=${this.stockQuantity}" }
+        this.stockQuantity = newStock
+        return newStock
+    }
+
+    /**
+     * 재고를 증가시킵니다 (환불/보상 트랜잭션용).
+     *
+     * @param quantity 증가시킬 수량
+     * @return 증가 후 재고 수량
+     */
+    fun increaseStock(quantity: Int): Int {
+        require(quantity > 0) { "Quantity must be positive" }
+        this.stockQuantity += quantity
+        return this.stockQuantity
+    }
+
+    /**
      * 상품을 소프트 삭제합니다.
      *
      * @return 이미 삭제된 경우 false, 삭제 성공 시 true

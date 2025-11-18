@@ -4,6 +4,7 @@ import com.groom.product.common.IntegrationTestBase
 import com.groom.product.common.config.NoOpEventPublisherConfig
 import com.groom.product.common.config.TestAwsConfig
 import com.groom.product.common.config.TestGeminiConfig
+import com.groom.product.common.config.TestRedissonConfig
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,7 +23,7 @@ import java.util.UUID
 
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-@Import(NoOpEventPublisherConfig::class, TestAwsConfig::class, TestGeminiConfig::class)
+@Import(NoOpEventPublisherConfig::class, TestAwsConfig::class, TestGeminiConfig::class, TestRedissonConfig::class)
 @Transactional(readOnly = false)
 @SqlGroup(
     Sql(
