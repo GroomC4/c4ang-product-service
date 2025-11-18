@@ -10,6 +10,10 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0" apply false
 }
 
+// 버전 관리
+extra["platformCoreVersion"] = "1.2.2-RC1"
+extra["testcontainersVersion"] = "1.19.7"
+
 allprojects {
     group = "com.groom"
     version = "0.0.1-SNAPSHOT"
@@ -19,6 +23,13 @@ allprojects {
         mavenCentral()
         maven {
             url = uri("https://packages.confluent.io/maven/")
+        }
+        maven {
+            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-platform-core")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
 

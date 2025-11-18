@@ -1,3 +1,16 @@
+# Platform Core Testcontainers 설정
+testcontainers:
+  postgres:
+    enabled: true
+    replica-enabled: true
+    schema-location: classpath:sql/schema.sql
+  redis:
+    enabled: true
+  kafka:
+    enabled: true
+  schema-registry:
+    enabled: true
+
 logging:
   level:
     root: INFO

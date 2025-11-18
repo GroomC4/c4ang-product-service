@@ -1,6 +1,7 @@
-spring:
+# Platform Core DataSource 설정
+platform:
   datasource:
-    master:
+    primary:
       url: jdbc:postgresql://localhost:15432/groom
       username: application
       password: application
@@ -12,6 +13,8 @@ spring:
       driver-class-name: org.postgresql.Driver
       hikari:
         maximum-pool-size: 5
+
+spring:
   jpa:
     hibernate:
       ddl-auto: none
