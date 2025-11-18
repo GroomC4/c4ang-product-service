@@ -95,6 +95,21 @@ CREATE TABLE IF NOT EXISTS p_product_audit (
     metadata          JSONB
     );
 
+-- Processed Events (이벤트 멱등성 보장)
+CREATE TABLE IF NOT EXISTS p_processed_event (
+    event_id          TEXT PRIMARY KEY,
+    event_type        TEXT NOT NULL,
+    processed_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+COMMENT ON TABLE p_processed_event IS 'Kafka 이벤트 중복 처리 방지를 위한 테이블';
+COMMENT ON COLUMN p_processed_event.event_id IS '처리된 이벤트의 고유 ID';
+COMMENT ON COLUMN p_processed_event.event_type IS '이벤트 타입 (예: order.created, store.info.updated)';
+COMMENT ON COLUMN p_processed_event.processed_at IS '이벤트 처리 시각';
+
+CREATE INDEX IF NOT EXISTS idx_processed_event_type ON p_processed_event(event_type);
+CREATE INDEX IF NOT EXISTS idx_processed_event_processed_at ON p_processed_event(processed_at);
+
 -- Stock Reservation Log (Redis 재고 예약 백업)
 CREATE TABLE IF NOT EXISTS p_stock_reservation_log (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),

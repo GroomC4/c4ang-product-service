@@ -10,6 +10,7 @@ plugins {
 
 // 버전 변수 참조 (루트 프로젝트에서 정의)
 val platformCoreVersion: String by rootProject.extra
+val springCloudContractVersion = "4.1.4"
 
 dependencies {
     // Platform Core - Production (datasource configuration)
@@ -63,6 +64,42 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
     testImplementation("io.mockk:mockk:1.14.5")
+
+    // Spring Cloud Contract
+    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier:$springCloudContractVersion")
+    testImplementation("io.rest-assured:rest-assured:5.3.2")
+    testImplementation("io.rest-assured:spring-mock-mvc:5.3.2")
+}
+
+// Spring Cloud Contract 설정
+contracts {
+    testMode.set(org.springframework.cloud.contract.verifier.config.TestMode.MOCKMVC)
+    baseClassForTests.set("com.groom.product.common.ContractTestBase")
+    contractsDslDir.set(file("src/test/resources/contracts"))
+}
+
+// Contract Stub 발행 설정 (Consumer가 사용할 수 있도록 GitHub Packages에 발행)
+publishing {
+    publications {
+        create<MavenPublication>("stubs") {
+            groupId = "com.groom"
+            artifactId = "product-service-contract-stubs"
+            version = project.version.toString()
+
+            artifact(tasks.named("verifierStubsJar"))
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-product-service")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
 
 // 모든 Test 태스크에 공통 설정 적용
