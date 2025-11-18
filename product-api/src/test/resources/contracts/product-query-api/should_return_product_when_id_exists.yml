@@ -1,0 +1,33 @@
+description: Product Query API - 유효한 상품 ID로 조회
+name: should_return_product_when_id_exists
+request:
+  method: GET
+  url: /api/v1/products/550e8400-e29b-41d4-a716-446655440000
+  headers:
+    Content-Type: application/json
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    id: "550e8400-e29b-41d4-a716-446655440000"
+    storeId: "650e8400-e29b-41d4-a716-446655440000"
+    storeName: "테스트 스토어"
+    categoryId: "750e8400-e29b-41d4-a716-446655440000"
+    name: "테스트 상품"
+    status: "ON_SALE"
+    price: 10000
+    stockQuantity: 100
+    thumbnailUrl: "https://example.com/thumbnail.jpg"
+    description: "테스트 상품 설명"
+    createdAt: 1699999999999
+    updatedAt: 1699999999999
+  matchers:
+    body:
+      - path: $.id
+        type: by_regex
+        value: "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+      - path: $.createdAt
+        type: by_type
+      - path: $.updatedAt
+        type: by_type
