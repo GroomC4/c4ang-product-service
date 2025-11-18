@@ -20,17 +20,17 @@ interface CategoryJpaRepository : JpaRepository<ProductCategory, UUID> {
         value =
             """
         WITH RECURSIVE category_path AS (
-            SELECT id, name, parent_category_id, depth, 0 AS path_index
+            SELECT id, name, parent_category_id, depth, created_at, updated_at, deleted_at, 0 AS path_index
             FROM p_product_category
             WHERE id = :categoryId
 
             UNION ALL
 
-            SELECT c.id, c.name, c.parent_category_id, c.depth, cp.path_index + 1
+            SELECT c.id, c.name, c.parent_category_id, c.depth, c.created_at, c.updated_at, c.deleted_at, cp.path_index + 1
             FROM p_product_category c
             INNER JOIN category_path cp ON c.id = cp.parent_category_id
         )
-        SELECT * FROM category_path
+        SELECT id, name, parent_category_id, depth, created_at, updated_at, deleted_at FROM category_path
         ORDER BY depth ASC
         """,
         nativeQuery = true,

@@ -1,6 +1,5 @@
 package com.groom.product.adapter.`in`.web
 
-import com.groom.product.common.TransactionApplier
 import com.groom.product.common.annotation.IntegrationTest
 import com.groom.product.common.config.NoOpEventPublisherConfig
 import com.groom.product.common.config.TestAwsConfig
@@ -19,6 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @IntegrationTest
@@ -26,6 +26,7 @@ import java.util.UUID
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @Import(NoOpEventPublisherConfig::class, TestAwsConfig::class, TestGeminiConfig::class)
+@Transactional(readOnly = false)
 @SqlGroup(
     Sql(
         scripts = ["/sql/cleanup-product-query-controller.sql"],
@@ -44,9 +45,6 @@ import java.util.UUID
 class ProductQueryControllerIntegrationTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
-
-    @Autowired
-    private lateinit var transactionApplier: TransactionApplier
 
     companion object {
         // Test Users
