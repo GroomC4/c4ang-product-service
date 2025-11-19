@@ -11,7 +11,7 @@ plugins {
 }
 
 // 버전 관리
-extra["platformCoreVersion"] = "1.2.5"
+extra["platformCoreVersion"] = "1.2.9"
 
 allprojects {
     group = "com.groom"
