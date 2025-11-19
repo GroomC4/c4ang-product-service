@@ -5,43 +5,20 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 
 /**
- * ⚠️ 통합 테스트 베이스 클래스
+ * 통합 테스트 베이스 클래스
  *
  * 모든 통합 테스트는 이 클래스를 상속해야 합니다.
  *
- * @IntegrationTest: Kafka/Schema Registry 동적 포트 자동 주입
- * @SpringBootTest properties: Testcontainers 설정
+ * Platform Core 1.2.5의 testcontainers-starter가 제공하는 기능:
+ * - application-test.yml의 testcontainers 설정을 자동으로 읽어서 컨테이너 시작
+ * - PostgreSQL Primary/Replica 자동 구성 및 라우팅
+ * - Redis, Kafka, Schema Registry 자동 시작
+ * - DataSource 자동 구성
  *
- * 제공 기능:
- * - PostgreSQL Primary/Replica Testcontainers 자동 시작
- * - Redis Testcontainers 자동 시작
- * - Kafka Testcontainers 자동 시작
- * - Schema Registry Testcontainers 자동 시작
- * - 스키마 파일 자동 로딩 (product-api/sql/schema.sql)
- * - Primary-Replica 자동 라우팅
- *   - @Transactional(readOnly = false) → Primary DB
- *   - @Transactional(readOnly = true) → Replica DB
+ * @IntegrationTest: Platform Core가 제공하는 통합 테스트 어노테이션
+ * @ActiveProfiles("test"): application-test.yml 활성화
  */
 @IntegrationTest
-@SpringBootTest(
-    properties = [
-        // PostgreSQL Primary/Replica 활성화
-        "testcontainers.postgres.enabled=true",
-        "testcontainers.postgres.replica-enabled=true",
-
-        // 스키마 파일 위치 (project: 접두사로 프로젝트 루트 기준 경로)
-        // IntelliJ와 Gradle 모두 지원
-        "testcontainers.postgres.schema-location=project:product-api/sql/schema.sql",
-
-        // Redis 활성화
-        "testcontainers.redis.enabled=true",
-
-        // Kafka 활성화
-        "testcontainers.kafka.enabled=true",
-
-        // Schema Registry 활성화 (Avro 직렬화 지원)
-        "testcontainers.schema-registry.enabled=true",
-    ],
-)
+@SpringBootTest
 @ActiveProfiles("test")
 abstract class IntegrationTestBase

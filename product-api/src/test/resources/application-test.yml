@@ -1,21 +1,36 @@
 spring:
   autoconfigure:
     exclude:
-      # Platform Core의 커스텀 DataSource를 사용하므로 Spring Boot 기본 자동 설정 비활성화
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-      # Redis 사용하지 않으므로 Redisson 자동 설정 비활성화
       - org.redisson.spring.starter.RedissonAutoConfigurationV2
+
   jpa:
     hibernate:
-      ddl-auto: none
-      naming:
-        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
 
-# Testcontainers 설정은 IntegrationTestBase에서 처리
-# - PostgreSQL Primary/Replica, Redis, Kafka, Schema Registry 자동 시작
-# - 스키마 파일 자동 로딩
-# - Kafka 동적 포트 자동 설정
+# Testcontainers 설정 (platform-core가 자동으로 DataSource 구성)
+testcontainers:
+  postgres:
+    enabled: true
+    replica-enabled: true
+    schema-location: project:sql/schema.sql
+    database: testdb
+    username: test
+    password: test
+
+  redis:
+    enabled: true
+
+  kafka:
+    enabled: true
+
+  schema-registry:
+    enabled: true
 
 logging:
   level:

@@ -1,5 +1,7 @@
 package com.groom.product.configuration.jpa
 
+import jakarta.persistence.EntityManagerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties
@@ -12,22 +14,29 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.orm.jpa.vendor.Database
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
 import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.annotation.EnableTransactionManagement
 import javax.sql.DataSource
 
+/**
+ * JPA 설정
+ *
+ * Platform Core의 datasource-starter가 제공하는 Primary DataSource를 사용합니다.
+ * - @Primary DataSource: DynamicRoutingDataSource (Master/Replica 자동 라우팅)
+ * - @Transactional(readOnly = true): Replica DB 사용
+ * - @Transactional(readOnly = false) 또는 기본: Master DB 사용
+ */
 @Configuration
 @EnableJpaRepositories(
     basePackages = ["com.groom.product"],
     entityManagerFactoryRef = "entityManagerFactory",
     transactionManagerRef = "transactionManager",
 )
+@EnableTransactionManagement
 class JpaConfig {
-    @Bean("transactionManager")
-    fun transactionManager(): PlatformTransactionManager = JpaTransactionManager()
-
     @Primary
     @Bean("entityManagerFactory")
-    fun entityManager(
-        dataSource: DataSource,
+    fun entityManagerFactory(
+        dataSource: DataSource, // Platform Core가 제공하는 Primary DataSource (DynamicRoutingDataSource)
         jpaProperties: JpaProperties,
         hibernateProperties: HibernateProperties,
     ): LocalContainerEntityManagerFactoryBean =
@@ -53,4 +62,10 @@ class JpaConfig {
                 },
             )
         }
+
+    @Bean("transactionManager")
+    @Primary
+    fun transactionManager(
+        @Qualifier("entityManagerFactory") entityManagerFactory: EntityManagerFactory,
+    ): PlatformTransactionManager = JpaTransactionManager(entityManagerFactory)
 }
