@@ -29,8 +29,8 @@ Product Service가 다른 도메인 서비스를 호출하는 부분을 정리�
 
 | Method | Endpoint | 설명 |
 |--------|----------|------|
-| GET | `/internal/api/v1/stores/{storeId}` | 스토어 ID로 조회 |
-| GET | `/internal/api/v1/stores/owner/{ownerId}` | 소유자 ID로 조회 |
+| GET | `/internal/v1/stores/{storeId}` | 스토어 ID로 조회 |
+| GET | `/internal/v1/stores/owner/{ownerId}` | 소유자 ID로 조회 |
 
 ### 응답 DTO
 

@@ -2,7 +2,7 @@ description: Store Internal API - 스토어가 없는 소유자 조회 시 404
 name: should_return_null_when_owner_has_no_store
 request:
   method: GET
-  url: /internal/api/v1/stores/owner/00000000-0000-0000-0000-000000000000
+  url: /internal/v1/stores/owner/00000000-0000-0000-0000-000000000000
   headers:
     Content-Type: application/json
 response:

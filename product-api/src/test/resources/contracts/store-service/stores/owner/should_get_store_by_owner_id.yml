@@ -2,7 +2,7 @@ description: Store Internal API - 소유자 ID로 스토어 조회
 name: should_get_store_by_owner_id
 request:
   method: GET
-  url: /internal/api/v1/stores/owner/750e8400-e29b-41d4-a716-446655440001
+  url: /internal/v1/stores/owner/750e8400-e29b-41d4-a716-446655440001
   headers:
     Content-Type: application/json
 response:
