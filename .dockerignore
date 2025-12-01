@@ -8,15 +8,13 @@
 *.iml
 .vscode
 
-# Build outputs
-build/
-*/build/
-out/
-*/out/
-
 # Gradle
-.gradle/
-*/.gradle/
+.gradle
+# build/ 디렉토리는 JAR 복사를 위해 포함 (GitHub Actions에서 빌드된 JAR 사용)
+!product-api/build/libs/*.jar
+
+# Claude
+.claude
 
 # Test reports
 */test-results/
@@ -28,9 +26,8 @@ out/
 .env.*
 
 # Documentation
-*.md
-!README.md
 docs/
+README.md
 
 # CI/CD
 .github/
