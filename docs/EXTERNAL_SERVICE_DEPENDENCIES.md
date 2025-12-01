@@ -4,6 +4,10 @@
 
 Product Service가 다른 도메인 서비스를 호출하는 부분을 정리한 문서입니다.
 
+서비스 간 호출은 **Internal API**를 통해 이루어집니다. Internal API는 외부 공개 API와 분리된 서비스 간 통신 전용 API입니다.
+
+> **인증**: Internal API 호출 시 별도의 인증 과정이 필요하지 않습니다. API Gateway (Istio)를 통해 이미 인증을 거친 후이므로, 서비스 간 호출에는 인증 헤더 없이 요청합니다.
+
 ---
 
 ## 1. Store Service 의존성
@@ -21,12 +25,12 @@ Product Service가 다른 도메인 서비스를 호출하는 부분을 정리�
 | Adapter | `adapter/outbound/client/StoreClientAdapter.kt` | Port 구현체 |
 | Adapter | `adapter/outbound/client/StoreServiceFeignClient.kt` | Feign Client |
 
-### 호출 API
+### 호출 API (Internal API)
 
 | Method | Endpoint | 설명 |
 |--------|----------|------|
-| GET | `/api/v1/stores/{storeId}` | 스토어 ID로 조회 |
-| GET | `/api/v1/stores/owner/{ownerId}` | 소유자 ID로 조회 |
+| GET | `/internal/api/v1/stores/{storeId}` | 스토어 ID로 조회 |
+| GET | `/internal/api/v1/stores/owner/{ownerId}` | 소유자 ID로 조회 |
 
 ### 응답 DTO
 
@@ -72,8 +76,13 @@ StoreInternalDto
 
 ### Consumer Contract Test
 
-Store Service의 API 계약을 검증하는 Consumer Contract Test가 구현되어 있습니다.
+Store Service의 Internal API 계약을 검증하는 Consumer Contract Test가 구현되어 있습니다.
 
+- **Contract 파일**: `src/test/resources/contracts/store-service/`
+  - `stores/get/should_get_store_by_id.yml` - 스토어 ID로 조회 성공 케이스
+  - `stores/get/should_return_404_when_store_not_found.yml` - 스토어 미존재 시 404 케이스
+  - `stores/owner/should_get_store_by_owner_id.yml` - 소유자 ID로 조회 성공 케이스
+  - `stores/owner/should_return_null_when_owner_has_no_store.yml` - 소유자 스토어 미존재 시 404 케이스
 - **테스트 파일**: `adapter/outbound/client/StoreServiceFeignClientConsumerContractTest.kt`
 - **Stub 아티팩트**: `com.groom:store-service-contract-stubs`
 - **Stub 저장소**: GitHub Packages (`GroomC4/c4ang-store-service`)
