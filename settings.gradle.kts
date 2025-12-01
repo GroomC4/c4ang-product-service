@@ -6,8 +6,8 @@ pluginManagement {
         maven {
             url = uri("https://maven.pkg.github.com/GroomC4/c4ang-packages-hub")
             credentials {
-                username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_ACTOR")
-                password = providers.gradleProperty("gpr.key").orNull ?: System.getenv("GITHUB_TOKEN")
+                username = System.getenv("GITHUB_ACTOR") ?: providers.gradleProperty("gpr.user").orNull
+                password = System.getenv("GITHUB_TOKEN") ?: providers.gradleProperty("gpr.key").orNull
             }
         }
     }
@@ -19,8 +19,8 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://maven.pkg.github.com/GroomC4/c4ang-packages-hub")
             credentials {
-                username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_ACTOR")
-                password = providers.gradleProperty("gpr.key").orNull ?: System.getenv("GITHUB_TOKEN")
+                username = System.getenv("GITHUB_ACTOR") ?: providers.gradleProperty("gpr.user").orNull
+                password = System.getenv("GITHUB_TOKEN") ?: providers.gradleProperty("gpr.key").orNull
             }
         }
     }

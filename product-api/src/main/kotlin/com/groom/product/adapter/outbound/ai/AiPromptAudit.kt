@@ -1,4 +1,4 @@
-package com.groom.product.common.domain.model
+package com.groom.product.adapter.outbound.ai
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

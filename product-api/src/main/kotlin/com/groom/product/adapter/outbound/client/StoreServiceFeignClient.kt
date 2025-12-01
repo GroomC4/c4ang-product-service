@@ -1,6 +1,6 @@
-package com.groom.product.adapter.out.client
+package com.groom.product.adapter.outbound.client
 
-import com.groom.product.adapter.out.client.dto.StoreInternalDto
+import com.groom.product.adapter.outbound.client.dto.StoreInternalDto
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.context.annotation.Profile

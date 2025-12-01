@@ -1,9 +1,8 @@
-package com.groom.product.contract
+package com.groom.product.adapter.outbound.client
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.groom.product.adapter.out.client.StoreServiceFeignClient
 import feign.Feign
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder

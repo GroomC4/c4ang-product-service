@@ -1,16 +1,15 @@
-package com.groom.product.adapter.`in`.web
+package com.groom.product.adapter.inbound.web
 
-import com.groom.product.common.IntegrationTestBase
+import com.groom.product.adapter.outbound.ai.TestGeminiConfig
+import com.groom.product.common.annotation.IntegrationTest
 import com.groom.product.common.config.NoOpEventPublisherConfig
 import com.groom.product.common.config.TestAwsConfig
-import com.groom.product.common.config.TestGeminiConfig
-import com.groom.product.common.config.TestRedissonConfig
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlGroup
 import org.springframework.test.web.servlet.MockMvc
@@ -18,13 +17,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
-@ActiveProfiles("test")
+@IntegrationTest
+@SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
-@Import(NoOpEventPublisherConfig::class, TestAwsConfig::class, TestGeminiConfig::class, TestRedissonConfig::class)
-@Transactional(readOnly = false)
+@Import(NoOpEventPublisherConfig::class, TestAwsConfig::class, TestGeminiConfig::class)
 @SqlGroup(
     Sql(
         scripts = ["/sql/cleanup-product-query-controller.sql"],
@@ -40,7 +38,7 @@ import java.util.UUID
     ),
 )
 @DisplayName("상품 조회(Query) 컨트롤러 통합 테스트")
-class ProductQueryControllerIntegrationTest : IntegrationTestBase() {
+class ProductQueryControllerIntegrationTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 

@@ -1,4 +1,4 @@
-package com.groom.product.configuration.properties
+package com.groom.product.adapter.outbound.ai
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

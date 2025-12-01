@@ -1,7 +1,6 @@
-package com.groom.product.common.config
+package com.groom.product.adapter.outbound.client
 
-import com.groom.product.adapter.out.client.StoreServiceClient
-import com.groom.product.adapter.out.client.dto.StoreInternalDto
+import com.groom.product.adapter.outbound.client.dto.StoreInternalDto
 import feign.FeignException
 import feign.Request
 import feign.RequestTemplate

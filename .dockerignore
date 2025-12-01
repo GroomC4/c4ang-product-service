@@ -1,0 +1,54 @@
+# Git
+.git
+.gitignore
+.gitmodules
+
+# IDE
+.idea
+*.iml
+.vscode
+
+# Build outputs
+build/
+*/build/
+out/
+*/out/
+
+# Gradle
+.gradle/
+*/.gradle/
+
+# Test reports
+*/test-results/
+*/reports/
+
+# Local configs
+*.local
+.env
+.env.*
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# CI/CD
+.github/
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Kubernetes/Helm
+helm/
+k8s/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.swp
+*~
