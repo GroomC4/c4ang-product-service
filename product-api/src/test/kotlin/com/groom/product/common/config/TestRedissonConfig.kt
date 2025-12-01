@@ -4,32 +4,38 @@ import org.redisson.Redisson
 import org.redisson.api.RedissonClient
 import org.redisson.config.Config
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 
 /**
- * Test용 Redisson 설정
+ * 테스트 환경 전용 Redisson 설정
  *
- * Testcontainers Redis와 연동하여 Redisson 클라이언트를 제공합니다.
+ * testcontainers-starter에서 주입된 Redis 정보를 사용합니다.
+ *
+ * 프로덕션/개발 환경에서는 RedissonConfig가 사용됩니다.
  */
-@TestConfiguration
 @Profile("test")
+@Configuration
 class TestRedissonConfig {
+    @Value("\${spring.data.redis.host:localhost}")
+    private lateinit var redisHost: String
+
+    @Value("\${spring.data.redis.port:6379}")
+    private var redisPort: Int = 6379
+
     @Bean
-    fun redissonClient(
-        @Value("\${spring.redis.host:localhost}") host: String,
-        @Value("\${spring.redis.port:6379}") port: Int,
-    ): RedissonClient {
+    fun redissonClient(): RedissonClient {
         val config = Config()
+
         config
             .useSingleServer()
-            .setAddress("redis://$host:$port")
+            .setAddress("redis://$redisHost:$redisPort")
             .setConnectionPoolSize(10)
             .setConnectionMinimumIdleSize(2)
-            .setTimeout(3000)
+            .setTimeout(3000) // 3초
             .setRetryAttempts(3)
-            .setRetryInterval(1500)
+            .setRetryInterval(1500) // 1.5초
 
         return Redisson.create(config)
     }

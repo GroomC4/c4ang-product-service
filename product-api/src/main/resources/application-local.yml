@@ -49,3 +49,46 @@ logging:
 
   file:
     path: ./logs
+
+security:
+  jwt:
+    secret: local-development-secret-please-change
+    issuer: ecommerce-service-api
+    accessTokenExpirationMinutes: 60
+    refreshTokenExpirationDays: 3
+
+feign:
+  clients:
+    store-service:
+      url: http://localhost:8082
+      connect-timeout: 10000
+      read-timeout: 10000
+      logger-level: full
+  client:
+    config:
+      store-service:
+        loggerLevel: full
+
+# Kafka Producer 설정 (로컬 개발 환경)
+kafka:
+  bootstrap-servers: localhost:9092
+  producer:
+    acks: all
+    retries: 3
+  schema-registry:
+    url: http://localhost:8081
+  topics:
+    product-registered: product.registered
+    product-deleted: product.deleted
+
+# AWS S3 설정 (로컬)
+aws:
+  s3:
+    bucket-name: ${AWS_S3_BUCKET:c4ang-product-images-dev}
+    region: ${AWS_REGION:ap-northeast-2}
+
+# Gemini AI 설정 (로컬)
+gemini:
+  api-key: ${GEMINI_API_KEY:}
+  model: gemini-pro
+  max-tokens: 2000

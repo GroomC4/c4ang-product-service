@@ -2,23 +2,57 @@ package com.groom.product.common
 
 import com.groom.platform.testcontainers.annotation.IntegrationTest
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 
 /**
  * 통합 테스트 베이스 클래스
  *
- * 모든 통합 테스트는 이 클래스를 상속해야 합니다.
+ * **사용법:**
+ * 1. 통합 테스트 클래스에서 이 클래스를 상속받기
+ * 2. @SpringBootTest 어노테이션 제거 (중복 방지)
+ * 3. 끝! Testcontainers 자동 시작됨
  *
- * Platform Core 1.2.5의 testcontainers-starter가 제공하는 기능:
- * - application-test.yml의 testcontainers 설정을 자동으로 읽어서 컨테이너 시작
- * - PostgreSQL Primary/Replica 자동 구성 및 라우팅
- * - Redis, Kafka, Schema Registry 자동 시작
- * - DataSource 자동 구성
+ * **예시:**
+ * ```kotlin
+ * class ProductServiceIntegrationTest : IntegrationTestBase() {
+ *     @Autowired
+ *     private lateinit var productRepository: ProductRepository
  *
- * @IntegrationTest: Platform Core가 제공하는 통합 테스트 어노테이션
- * @ActiveProfiles("test"): application-test.yml 활성화
+ *     @Test
+ *     fun `테스트`() { ... }
+ * }
+ * ```
+ *
+ * **platform-core testcontainers-starter 사용:**
+ * - @IntegrationTest 어노테이션 중앙화
+ * - PostgreSQL Primary/Replica, Redis, Kafka 자동 시작
+ * - 동적 포트 주입 자동화
  */
 @IntegrationTest
-@SpringBootTest
-@ActiveProfiles("test")
+@SpringBootTest(
+    properties = [
+        // Spring Profile
+        "spring.profiles.active=test",
+
+        // PostgreSQL
+        "testcontainers.postgres.enabled=true",
+        "testcontainers.postgres.replica-enabled=true",
+        "testcontainers.postgres.schema-location=project:sql/schema.sql",
+
+        // Redis
+        "testcontainers.redis.enabled=true",
+
+        // Kafka
+        "testcontainers.kafka.enabled=true",
+        "testcontainers.kafka.auto-create-topics=true",
+
+        // Kafka Topics
+        "testcontainers.kafka.topics[0].name=product.registered",
+        "testcontainers.kafka.topics[0].partitions=3",
+        "testcontainers.kafka.topics[0].replication-factor=1",
+
+        "testcontainers.kafka.topics[1].name=product.deleted",
+        "testcontainers.kafka.topics[1].partitions=1",
+        "testcontainers.kafka.topics[1].replication-factor=1",
+    ],
+)
 abstract class IntegrationTestBase

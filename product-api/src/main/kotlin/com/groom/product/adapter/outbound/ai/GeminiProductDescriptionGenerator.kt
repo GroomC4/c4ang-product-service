@@ -1,5 +1,6 @@
 package com.groom.product.adapter.outbound.ai
 
+import com.groom.product.adapter.out.ai.GeminiFeignClient
 import com.groom.product.configuration.properties.GeminiProperties
 import com.groom.product.domain.port.ProductDescriptionGenerationException
 import com.groom.product.domain.port.ProductDescriptionGenerator

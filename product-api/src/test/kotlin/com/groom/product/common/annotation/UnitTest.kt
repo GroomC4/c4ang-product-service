@@ -1,7 +1,6 @@
 package com.groom.product.common.annotation
 
 import org.junit.jupiter.api.Tag
-import org.springframework.test.context.ActiveProfiles
 
 /**
  * 단위 테스트를 표시하는 어노테이션.
@@ -9,6 +8,5 @@ import org.springframework.test.context.ActiveProfiles
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-@Tag("unit-test")
-@ActiveProfiles("test")
+@Tag("unit")
 annotation class UnitTest

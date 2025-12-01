@@ -29,7 +29,6 @@ class ProductImage(
     @Column
     val deletedAt: LocalDateTime? = null,
 ) : CreatedAndUpdatedAtAuditEntity() {
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     var product: Product? = null

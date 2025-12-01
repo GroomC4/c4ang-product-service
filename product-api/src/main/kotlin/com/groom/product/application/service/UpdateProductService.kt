@@ -1,8 +1,8 @@
 package com.groom.product.application.service
 
-import com.groom.product.common.domain.DomainEventPublisher
 import com.groom.product.application.dto.UpdateProductCommand
 import com.groom.product.application.dto.UpdateProductResult
+import com.groom.product.common.domain.DomainEventPublisher
 import com.groom.product.domain.event.ProductInfoUpdatedEvent
 import com.groom.product.domain.model.Price
 import com.groom.product.domain.model.ProductDescription

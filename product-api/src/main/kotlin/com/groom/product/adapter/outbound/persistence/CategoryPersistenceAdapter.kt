@@ -16,6 +16,5 @@ class CategoryPersistenceAdapter(
 ) : LoadCategoryPort {
     override fun loadById(id: UUID): ProductCategory? = categoryJpaRepository.findById(id).orElse(null)
 
-    override fun loadAncestorCategoriesById(id: UUID): List<ProductCategory> =
-        categoryJpaRepository.findAncestorCategoriesById(id)
+    override fun loadAncestorCategoriesById(id: UUID): List<ProductCategory> = categoryJpaRepository.findAncestorCategoriesById(id)
 }

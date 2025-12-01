@@ -1,6 +1,6 @@
 package com.groom.product.common.config
 
-import com.groom.product.configuration.properties.GeminiProperties
+import com.groom.product.common.configuration.GeminiProperties
 import com.groom.product.domain.port.ProductDescriptionGenerator
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
@@ -13,24 +13,19 @@ import org.springframework.context.annotation.Primary
  */
 @TestConfiguration
 class TestGeminiConfig {
-
     @Bean
     @Primary
-    fun geminiProperties(): GeminiProperties {
-        return GeminiProperties(
+    fun geminiProperties(): GeminiProperties =
+        GeminiProperties(
             apiKey = "test-api-key",
             model = "gemini-pro",
-            maxTokens = 2000
+            maxTokens = 2000,
         )
-    }
 
     @Bean
     @Primary
-    fun productDescriptionGenerator(): ProductDescriptionGenerator {
-        return object : ProductDescriptionGenerator {
-            override fun generate(prompt: String): String {
-                return "테스트용 상품 설명: $prompt"
-            }
+    fun productDescriptionGenerator(): ProductDescriptionGenerator =
+        object : ProductDescriptionGenerator {
+            override fun generate(prompt: String): String = "테스트용 상품 설명: $prompt"
         }
-    }
 }

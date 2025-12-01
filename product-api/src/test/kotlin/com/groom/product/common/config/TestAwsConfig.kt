@@ -13,10 +13,7 @@ import software.amazon.awssdk.services.s3.S3Client
  */
 @TestConfiguration
 class TestAwsConfig {
-
     @Bean
     @Primary
-    fun s3Client(): S3Client {
-        return Mockito.mock(S3Client::class.java)
-    }
+    fun s3Client(): S3Client = Mockito.mock(S3Client::class.java)
 }

@@ -1,14 +1,13 @@
 package com.groom.product.adapter.`in`.web
 
-import com.groom.product.application.service.UploadProductImageService
 import com.groom.product.adapter.`in`.web.dto.UploadImageResponse
+import com.groom.product.application.service.UploadProductImageService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
@@ -48,7 +47,6 @@ class ProductImageController(
             ApiResponse(responseCode = "403", description = "권한 없음 (Owner 권한 필요)"),
         ],
     )
-    
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @ResponseStatus(HttpStatus.CREATED)
     fun uploadImage(

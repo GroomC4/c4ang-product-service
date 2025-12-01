@@ -14,12 +14,14 @@ class GetProductDetailService(
 ) {
     @Transactional(readOnly = true)
     fun getProductDetail(query: GetProductDetailQuery): GetProductDetailResult {
-        val product = loadProductPort.loadByIdWithImages(query.productId)
-            ?: throw IllegalArgumentException("Product not found: ${query.productId}")
+        val product =
+            loadProductPort.loadByIdWithImages(query.productId)
+                ?: throw IllegalArgumentException("Product not found: ${query.productId}")
 
-        val categoryPath = product.categoryId.let {
-            categoryPathBuilder.buildPath(it)
-        }
+        val categoryPath =
+            product.categoryId.let {
+                categoryPathBuilder.buildPath(it)
+            }
 
         return GetProductDetailResult.from(product, categoryPath)
     }
