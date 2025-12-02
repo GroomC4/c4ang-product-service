@@ -31,9 +31,12 @@ feign:
         loggerLevel: full
 
 spring:
+  main:
+    allow-bean-definition-overriding: true  # platform-core Bean 충돌 해결 (임시)
   autoconfigure:
     exclude:
       - org.redisson.spring.starter.RedissonAutoConfigurationV2
+      - com.groom.platform.autoconfigure.RedisConfiguration  # testcontainers-starter와 충돌 방지
 
 # Kafka 설정 (커스텀 - Testcontainers가 제공하는 값으로 오버라이드됨)
 kafka:
