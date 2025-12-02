@@ -170,11 +170,10 @@ class Product(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Product) return false
-        if (id == null || other.id == null) return false
         return id == other.id
     }
 
-    override fun hashCode(): Int = id?.hashCode() ?: System.identityHashCode(this)
+    override fun hashCode(): Int = id.hashCode()
 
     override fun toString(): String = "Product(id=$id, name=$name, status=$status, price=$price)"
 }
