@@ -8,8 +8,9 @@ plugins {
     `maven-publish`
 }
 
-// 버전 변수 참조 (루트 프로젝트에서 정의)
-val platformCoreVersion: String by rootProject.extra
+// Platform Core 버전 관리
+val platformCoreVersion = "2.3.0"
+// Spring Cloud Contract 버전
 val springCloudContractVersion = "4.1.4"
 
 dependencies {
@@ -33,11 +34,6 @@ dependencies {
 
     // Kafka
     implementation("org.springframework.kafka:spring-kafka")
-    implementation("io.confluent:kafka-avro-serializer:7.5.1")
-    implementation("io.confluent:kafka-schema-registry-client:7.5.1")
-
-    // Contract Hub (Avro 스키마) - Maven Local에서 가져오기
-    implementation("com.c4ang:c4ang-contract-hub:1.0.0-SNAPSHOT")
 
     // Spring Cloud BOM (Spring Boot 3.3.4와 호환)
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.3"))
@@ -45,7 +41,7 @@ dependencies {
     // Spring Cloud OpenFeign (버전은 BOM에서 관리)
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 
-    // Logging방ㅇ
+    // Logging
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.13")
 
     // Redisson (Redis 클라이언트 with 원자적 연산 지원)
@@ -59,12 +55,23 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.3")
 
+    // Platform Core - DataSource (프로덕션 환경)
+    implementation("io.github.groomc4:platform-core:$platformCoreVersion")
+
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
     testImplementation("io.mockk:mockk:1.14.5")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
 
+    // Platform Core - Testcontainers (테스트 전용)
+    testImplementation("io.github.groomc4:testcontainers-starter:$platformCoreVersion")
+
+    // Spring Cloud Contract Stub Runner (Consumer Contract Test)
+    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
+    // Feign Jackson for contract tests
+    testImplementation("io.github.openfeign:feign-jackson:13.1")
     // Spring Cloud Contract
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier:$springCloudContractVersion")
     testImplementation("io.rest-assured:rest-assured:5.3.2")
@@ -110,6 +117,10 @@ tasks.withType<Test> {
 
     systemProperty("user.timezone", "KST")
     jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
+
+    // Stub Runner가 GitHub Packages에서 Stub을 다운로드하기 위한 인증 설정
+    systemProperty("stubrunner.username", System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") ?: "")
+    systemProperty("stubrunner.password", System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.token") ?: "")
 
     // 테스트 실행 로깅
     testLogging {

@@ -1,19 +1,18 @@
 package com.groom.product.adapter.`in`.web
 
+import com.groom.product.adapter.`in`.web.dto.GetProductDetailResponse
+import com.groom.product.adapter.`in`.web.dto.ListOwnerProductsResponse
+import com.groom.product.adapter.`in`.web.dto.SearchProductsResponse
 import com.groom.product.application.dto.GetProductDetailQuery
 import com.groom.product.application.dto.ListOwnerProductsQuery
 import com.groom.product.application.dto.SearchProductsQuery
 import com.groom.product.application.service.GetProductDetailService
 import com.groom.product.application.service.ListOwnerProductsService
 import com.groom.product.application.service.SearchProductsService
-import com.groom.product.adapter.`in`.web.dto.GetProductDetailResponse
-import com.groom.product.adapter.`in`.web.dto.ListOwnerProductsResponse
-import com.groom.product.adapter.`in`.web.dto.SearchProductsResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -62,7 +61,6 @@ class ProductQueryController(
             ApiResponse(responseCode = "403", description = "권한 없음 (Owner 권한 필요)"),
         ],
     )
-    
     @GetMapping("/owner")
     fun listOwnerProducts(
         @RequestParam storeId: String,

@@ -2,9 +2,9 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.2.20" apply false
-    id("org.jetbrains.kotlin.plugin.spring") version "2.2.20" apply false
-    id("org.jetbrains.kotlin.plugin.jpa") version "2.2.20" apply false
+    id("org.jetbrains.kotlin.jvm") version "2.0.21" apply false
+    id("org.jetbrains.kotlin.plugin.spring") version "2.0.21" apply false
+    id("org.jetbrains.kotlin.plugin.jpa") version "2.0.21" apply false
     id("org.springframework.boot") version "3.3.4" apply false
     id("io.spring.dependency-management") version "1.1.6" apply false
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0" apply false
@@ -15,13 +15,21 @@ extra["platformCoreVersion"] = "1.2.9"
 
 allprojects {
     group = "com.groom"
-    version = "0.0.1-SNAPSHOT"
+    // GitHub Actions에서 태그를 푸시하면 GITHUB_REF_NAME 환경변수로 버전을 가져옴
+    // 예: v1.0.0 -> 1.0.0
+    version = System.getenv("GITHUB_REF_NAME")?.removePrefix("v") ?: "0.0.1-SNAPSHOT"
 
     repositories {
-        mavenLocal() // Maven Local 저장소 추가 (contract-hub 의존성)
         mavenCentral()
+
+        // GitHub Packages for platform-core
         maven {
-            url = uri("https://packages.confluent.io/maven/")
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-platform-core")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
         maven {
             url = uri("https://maven.pkg.github.com/GroomC4/c4ang-platform-core")

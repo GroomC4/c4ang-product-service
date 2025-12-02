@@ -8,14 +8,12 @@ import org.springframework.context.annotation.Primary
 
 @TestConfiguration
 class NoOpEventPublisherConfig {
-
     @Bean
     @Primary
-    fun domainEventPublisher(): DomainEventPublisher {
-        return object : DomainEventPublisher {
+    fun domainEventPublisher(): DomainEventPublisher =
+        object : DomainEventPublisher {
             override fun publish(event: DomainEvent) {
                 println("NoOpEventPublisher: Event publishing is disabled in tests. Event: ${event.javaClass.simpleName}")
             }
         }
-    }
 }

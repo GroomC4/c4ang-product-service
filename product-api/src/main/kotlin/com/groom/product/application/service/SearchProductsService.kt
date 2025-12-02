@@ -1,9 +1,9 @@
 package com.groom.product.application.service
 
+import com.groom.product.adapter.out.persistence.ProductSpecifications
 import com.groom.product.application.dto.SearchProductsQuery
 import com.groom.product.application.dto.SearchProductsResult
 import com.groom.product.domain.port.SearchProductsPort
-import com.groom.product.adapter.outbound.persistence.ProductSpecifications
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service

@@ -1,7 +1,7 @@
 package com.groom.product.application.service
 
-import com.groom.product.common.application.service.AiPromptAuditService
 import com.groom.product.application.dto.GenerateProductDescriptionCommand
+import com.groom.product.common.application.service.AiPromptAuditService
 import com.groom.product.domain.port.ProductDescriptionGenerator
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

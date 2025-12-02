@@ -1,8 +1,8 @@
 package com.groom.product.application.event
 
+import com.groom.product.adapter.out.persistence.ProductAuditJpaRepository
 import com.groom.product.domain.event.ProductRestoredEvent
 import com.groom.product.domain.model.ProductAudit
-import com.groom.product.adapter.outbound.persistence.ProductAuditJpaRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional

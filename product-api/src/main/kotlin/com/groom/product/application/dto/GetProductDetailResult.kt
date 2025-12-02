@@ -68,10 +68,11 @@ data class GetProductDetailResult(
                 status = product.status,
                 categoryId = product.categoryId.toString(),
                 categoryPath = categoryPath,
-                store = StoreInfo(
-                    id = product.storeId.toString(),
-                    name = product.storeName,
-                ),
+                store =
+                    StoreInfo(
+                        id = product.storeId.toString(),
+                        name = product.storeName,
+                    ),
                 images = product.images.map { ProductImageInfo.from(it) },
                 createdAt = product.createdAt.toString(),
             )

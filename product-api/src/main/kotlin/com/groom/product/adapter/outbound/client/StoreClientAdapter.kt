@@ -2,36 +2,49 @@ package com.groom.product.adapter.outbound.client
 
 import com.groom.product.domain.model.StoreInfo
 import com.groom.product.domain.port.LoadStorePort
+import feign.FeignException
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import java.util.UUID
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * Store 외부 서비스 호출 Adapter.
  *
  * LoadStorePort를 구현하여 Domain Layer와 외부 Store Service를 연결합니다.
  *
- * TODO: 실제 Feign Client 또는 RestTemplate을 사용하여 Store Service 호출 구현 필요
- * 현재는 임시로 기존 ProductStoreReaderAdapter의 구현을 delegate합니다.
+ * StoreServiceClient를 통해 Store Service와 통신합니다.
+ * - 실제 환경: StoreServiceFeignClient (REST API)
+ * - 테스트 환경: MockStoreServiceClient
  */
 @Component
 class StoreClientAdapter(
-    // TODO: Inject Feign Client when Store Service is ready
-    // private val storeClient: StoreClient
+    private val storeServiceClient: StoreServiceClient,
 ) : LoadStorePort {
     override fun loadByIdAndOwnerId(
         storeId: UUID,
         ownerId: UUID,
     ): StoreInfo? {
-        // TODO: Implement actual external service call
-        // Example:
-        // try {
-        //     val response = storeClient.getStore(storeId, ownerId)
-        //     return StoreInfo(id = response.id, name = response.name, ownerId = response.ownerId)
-        // } catch (e: FeignException) {
-        //     return null
-        // }
+        return try {
+            val storeDto = storeServiceClient.getById(storeId)
 
-        // Temporary: Return null (will be implemented when Store Service is integrated)
-        return null
+            // 소유자 검증
+            if (storeDto.ownerUserId != ownerId.toString()) {
+                logger.warn { "Store owner mismatch: storeId=$storeId, expected=$ownerId, actual=${storeDto.ownerUserId}" }
+                return null
+            }
+
+            StoreInfo(
+                id = UUID.fromString(storeDto.storeId),
+                name = storeDto.name,
+            )
+        } catch (e: FeignException.NotFound) {
+            logger.debug { "Store not found: storeId=$storeId" }
+            null
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to load store: storeId=$storeId" }
+            null
+        }
     }
 }

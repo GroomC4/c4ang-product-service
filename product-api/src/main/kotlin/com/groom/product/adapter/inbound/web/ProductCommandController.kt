@@ -1,10 +1,5 @@
 package com.groom.product.adapter.`in`.web
 
-import com.groom.product.application.service.DeleteProductService
-import com.groom.product.application.service.RegisterProductService
-import com.groom.product.application.service.ToggleProductHideService
-import com.groom.product.application.service.UpdateProductService
-import com.groom.product.common.util.IstioHeaderExtractor
 import com.groom.product.adapter.`in`.web.dto.DeleteProductRequest
 import com.groom.product.adapter.`in`.web.dto.DeleteProductResponse
 import com.groom.product.adapter.`in`.web.dto.RegisterProductRequest
@@ -13,6 +8,11 @@ import com.groom.product.adapter.`in`.web.dto.ToggleProductHideRequest
 import com.groom.product.adapter.`in`.web.dto.ToggleProductHideResponse
 import com.groom.product.adapter.`in`.web.dto.UpdateProductRequest
 import com.groom.product.adapter.`in`.web.dto.UpdateProductResponse
+import com.groom.product.application.service.DeleteProductService
+import com.groom.product.application.service.RegisterProductService
+import com.groom.product.application.service.ToggleProductHideService
+import com.groom.product.application.service.UpdateProductService
+import com.groom.product.common.util.IstioHeaderExtractor
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -63,8 +63,9 @@ class ProductCommandController(
      */
     @Operation(
         summary = "상품 등록",
-        description = "새로운 상품을 등록합니다. Owner 권한이 필요합니다. AI 설명 생성 옵션을 지원합니다. " +
-            "Istio API Gateway에서 X-User-Id, X-User-Role 헤더를 통해 인증/인가를 처리합니다.",
+        description =
+            "새로운 상품을 등록합니다. Owner 권한이 필요합니다. AI 설명 생성 옵션을 지원합니다. " +
+                "Istio API Gateway에서 X-User-Id, X-User-Role 헤더를 통해 인증/인가를 처리합니다.",
     )
     @ApiResponses(
         value = [
