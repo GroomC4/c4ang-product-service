@@ -1,10 +1,7 @@
 package com.groom.product.adapter.outbound.ai
 
-import com.groom.product.adapter.out.ai.GeminiFeignClient
-import com.groom.product.configuration.properties.GeminiProperties
 import com.groom.product.domain.port.ProductDescriptionGenerationException
 import com.groom.product.domain.port.ProductDescriptionGenerator
-import com.groom.product.adapter.outbound.ai.GeminiFeignClient
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 

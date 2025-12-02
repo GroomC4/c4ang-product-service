@@ -1,7 +1,5 @@
-package com.groom.product.common.application.service
+package com.groom.product.adapter.outbound.ai
 
-import com.groom.product.common.domain.model.AiPromptAudit
-import com.groom.product.common.infrastructure.repository.AiPromptAuditJpaRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -15,7 +13,7 @@ import java.util.UUID
  */
 @Service
 class AiPromptAuditService(
-    private val aiPromptAuditJpaRepository: AiPromptAuditJpaRepository,
+    private val aiPromptAuditRepository: AiPromptAuditRepository,
 ) {
     /**
      * AI 프롬프트 감사 로그를 저장합니다.
@@ -46,6 +44,6 @@ class AiPromptAuditService(
                 success = success,
                 errorMessage = errorMessage,
             )
-        aiPromptAuditJpaRepository.save(audit)
+        aiPromptAuditRepository.save(audit)
     }
 }

@@ -1,4 +1,4 @@
-package com.groom.product.adapter.out.client.dto
+package com.groom.product.adapter.outbound.client.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalDateTime

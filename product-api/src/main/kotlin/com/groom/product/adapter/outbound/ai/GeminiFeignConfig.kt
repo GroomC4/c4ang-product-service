@@ -1,6 +1,5 @@
 package com.groom.product.adapter.outbound.ai
 
-import com.groom.product.configuration.properties.GeminiProperties
 import feign.RequestInterceptor
 import org.springframework.context.annotation.Bean
 

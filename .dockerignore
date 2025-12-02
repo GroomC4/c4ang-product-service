@@ -1,0 +1,51 @@
+# Git
+.git
+.gitignore
+.gitmodules
+
+# IDE
+.idea
+*.iml
+.vscode
+
+# Gradle
+.gradle
+# build/ 디렉토리는 JAR 복사를 위해 포함 (GitHub Actions에서 빌드된 JAR 사용)
+!product-api/build/libs/*.jar
+
+# Claude
+.claude
+
+# Test reports
+*/test-results/
+*/reports/
+
+# Local configs
+*.local
+.env
+.env.*
+
+# Documentation
+docs/
+README.md
+
+# CI/CD
+.github/
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Kubernetes/Helm
+helm/
+k8s/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.swp
+*~

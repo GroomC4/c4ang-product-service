@@ -1,6 +1,5 @@
-package com.groom.product.common.config
+package com.groom.product.adapter.outbound.ai
 
-import com.groom.product.common.configuration.GeminiProperties
 import com.groom.product.domain.port.ProductDescriptionGenerator
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
