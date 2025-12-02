@@ -1,4 +1,4 @@
-package com.groom.product.adapter.`in`.web.dto
+package com.groom.product.adapter.inbound.web.dto
 
 import com.groom.product.application.dto.ListOwnerProductsResult
 import io.swagger.v3.oas.annotations.media.Schema

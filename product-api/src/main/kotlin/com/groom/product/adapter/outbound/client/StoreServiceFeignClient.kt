@@ -1,7 +1,6 @@
 package com.groom.product.adapter.outbound.client
 
 import com.groom.product.adapter.outbound.client.dto.StoreInternalDto
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.GetMapping
@@ -21,7 +20,6 @@ import java.util.UUID
     url = "\${feign.clients.store-service.url:http://localhost:8082}",
 )
 @Profile("!test")
-@ConditionalOnMissingBean(StoreServiceClient::class)
 interface StoreServiceFeignClient : StoreServiceClient {
     /**
      * 특정 스토어 정보 조회
