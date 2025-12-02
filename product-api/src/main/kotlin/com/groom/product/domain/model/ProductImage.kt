@@ -36,11 +36,10 @@ class ProductImage(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ProductImage) return false
-        if (id == null || other.id == null) return false
         return id == other.id
     }
 
-    override fun hashCode(): Int = id?.hashCode() ?: System.identityHashCode(this)
+    override fun hashCode(): Int = id.hashCode()
 
     override fun toString(): String = "ProductImage(id=$id, imageType=$imageType, displayOrder=$displayOrder)"
 }

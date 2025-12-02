@@ -1,11 +1,15 @@
 package com.groom.product.common
 
 import com.groom.platform.testcontainers.annotation.IntegrationTest
+import com.groom.product.adapter.outbound.ai.TestGeminiConfig
+import com.groom.product.common.config.NoOpEventPublisherConfig
+import com.groom.product.common.config.TestAwsConfig
 import io.restassured.module.mockmvc.RestAssuredMockMvc
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlGroup
 import org.springframework.web.context.WebApplicationContext
@@ -22,6 +26,7 @@ import org.springframework.web.context.WebApplicationContext
  * Contract Test 전용 설정을 사용합니다.
  */
 @IntegrationTest
+@Import(NoOpEventPublisherConfig::class, TestGeminiConfig::class, TestAwsConfig::class)
 @SpringBootTest(
     properties = [
         "spring.profiles.active=test",
