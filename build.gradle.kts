@@ -10,9 +10,6 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0" apply false
 }
 
-// 버전 관리
-extra["platformCoreVersion"] = "1.2.9"
-
 allprojects {
     group = "com.groom"
     // GitHub Actions에서 태그를 푸시하면 GITHUB_REF_NAME 환경변수로 버전을 가져옴
@@ -22,6 +19,12 @@ allprojects {
     repositories {
         mavenCentral()
 
+        // Confluent Maven Repository (Kafka Avro Serializer, Schema Registry)
+        maven {
+            name = "Confluent"
+            url = uri("https://packages.confluent.io/maven/")
+        }
+
         // GitHub Packages for platform-core
         maven {
             name = "GitHubPackages"
@@ -29,13 +32,6 @@ allprojects {
             credentials {
                 username = System.getenv("GITHUB_ACTOR") ?: findProperty("gpr.user") as String?
                 password = System.getenv("GITHUB_TOKEN") ?: findProperty("gpr.key") as String?
-            }
-        }
-        maven {
-            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-platform-core")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }

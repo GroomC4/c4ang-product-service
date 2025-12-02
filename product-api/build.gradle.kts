@@ -29,6 +29,15 @@ dependencies {
 
     // Kafka
     implementation("org.springframework.kafka:spring-kafka")
+    implementation("io.confluent:kafka-avro-serializer:7.5.1")
+    implementation("io.confluent:kafka-schema-registry-client:7.5.1")
+
+    // Contract Hub (Avro 스키마)
+    implementation("io.github.groomc4:c4ang-contract-hub:1.1.0")
+
+    // AWS SDK for S3
+    implementation(platform("software.amazon.awssdk:bom:2.20.26"))
+    implementation("software.amazon.awssdk:s3")
 
     // Spring Cloud BOM (Spring Boot 3.3.4와 호환)
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.3"))
@@ -94,8 +103,7 @@ tasks.withType<Test> {
 }
 
 tasks.test {
-    useJUnitPlatform {
-    }
+    useJUnitPlatform()
 }
 
 // 통합 테스트 전용 태스크 (Docker Compose 기반)

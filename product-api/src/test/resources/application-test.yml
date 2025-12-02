@@ -1,67 +1,14 @@
-spring:
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-      - org.redisson.spring.starter.RedissonAutoConfigurationV2
-
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-
-# Testcontainers 설정 (platform-core가 자동으로 DataSource 구성)
-testcontainers:
-  postgres:
-    enabled: true
-    replica-enabled: true
-    schema-location: project:sql/schema.sql
-    database: testdb
-    username: test
-    password: test
-
-  redis:
-    enabled: true
-
-  kafka:
-    enabled: true
-
-  schema-registry:
-    enabled: true
-
 logging:
   level:
     root: INFO
-    org.springframework.jdbc: DEBUG
-    org.springframework.jdbc.datasource.init: DEBUG
-    org.postgresql: DEBUG
-    com.groom.product: DEBUG
-    com.groom.product: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.hibernate.orm.jdbc.bind: TRACE
-    org.springframework.data.jpa: DEBUG
+    com.groom.product: INFO
+    com.groom.platform: DEBUG  # Keep DEBUG for testcontainers troubleshooting
+    org.springframework.boot.autoconfigure: DEBUG  # Auto-configuration debug
 
-spring:
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    producer:
-      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    consumer:
-      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-  jpa:
-    hibernate:
-      ddl-auto: none
-      naming:
-        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
-
+# Gemini AI 설정 (테스트용)
 gemini:
-  api-key: "test-api-key"
-  model: "gemini-pro"
+  api-key: test-api-key
+  model: gemini-pro
   max-tokens: 2000
 
 aws:
@@ -74,7 +21,7 @@ aws:
 feign:
   clients:
     store-service:
-      url: http://localhost:8081
+      url: http://localhost:8082
       connect-timeout: 5000
       read-timeout: 5000
       logger-level: full
@@ -82,3 +29,42 @@ feign:
     config:
       store-service:
         loggerLevel: full
+
+spring:
+  autoconfigure:
+    exclude:
+      - org.redisson.spring.starter.RedissonAutoConfigurationV2
+
+# Kafka 설정 (커스텀 - Testcontainers가 제공하는 값으로 오버라이드됨)
+kafka:
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  schema-registry:
+    url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
+  topics:
+    # Product Service (Producer)
+    product-registered: product.registered
+    product-deleted: product.deleted
+    # Stock Events (Producer)
+    stock-reserved: stock.reserved
+    stock-reservation-failed: stock.reservation.failed
+    stock-confirmed: stock.confirmed
+    # Store Service (Consumer)
+    store-info-updated: store.info.updated
+    store-deleted: store.deleted
+    # Order Service (Consumer)
+    order-created: order.created
+    # Payment Service (Consumer)
+    payment-completed: payment.completed
+
+# TestContainers 설정 (자동으로 Docker 컨테이너 시작)
+testcontainers:
+  postgres:
+    enabled: true
+    image: postgres:15-alpine
+    database-name: testdb
+  redis:
+    enabled: true
+    image: redis:7-alpine
+  kafka:
+    enabled: true
+    image: confluentinc/cp-kafka:7.5.0
