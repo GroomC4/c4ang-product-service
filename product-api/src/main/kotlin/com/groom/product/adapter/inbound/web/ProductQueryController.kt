@@ -1,8 +1,8 @@
-package com.groom.product.adapter.`in`.web
+package com.groom.product.adapter.inbound.web
 
-import com.groom.product.adapter.`in`.web.dto.GetProductDetailResponse
-import com.groom.product.adapter.`in`.web.dto.ListOwnerProductsResponse
-import com.groom.product.adapter.`in`.web.dto.SearchProductsResponse
+import com.groom.product.adapter.inbound.web.dto.GetProductDetailResponse
+import com.groom.product.adapter.inbound.web.dto.ListOwnerProductsResponse
+import com.groom.product.adapter.inbound.web.dto.SearchProductsResponse
 import com.groom.product.application.dto.GetProductDetailQuery
 import com.groom.product.application.dto.ListOwnerProductsQuery
 import com.groom.product.application.dto.SearchProductsQuery

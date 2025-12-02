@@ -1,13 +1,13 @@
-package com.groom.product.adapter.`in`.web
+package com.groom.product.adapter.inbound.web
 
-import com.groom.product.adapter.`in`.web.dto.DeleteProductRequest
-import com.groom.product.adapter.`in`.web.dto.DeleteProductResponse
-import com.groom.product.adapter.`in`.web.dto.RegisterProductRequest
-import com.groom.product.adapter.`in`.web.dto.RegisterProductResponse
-import com.groom.product.adapter.`in`.web.dto.ToggleProductHideRequest
-import com.groom.product.adapter.`in`.web.dto.ToggleProductHideResponse
-import com.groom.product.adapter.`in`.web.dto.UpdateProductRequest
-import com.groom.product.adapter.`in`.web.dto.UpdateProductResponse
+import com.groom.product.adapter.inbound.web.dto.DeleteProductRequest
+import com.groom.product.adapter.inbound.web.dto.DeleteProductResponse
+import com.groom.product.adapter.inbound.web.dto.RegisterProductRequest
+import com.groom.product.adapter.inbound.web.dto.RegisterProductResponse
+import com.groom.product.adapter.inbound.web.dto.ToggleProductHideRequest
+import com.groom.product.adapter.inbound.web.dto.ToggleProductHideResponse
+import com.groom.product.adapter.inbound.web.dto.UpdateProductRequest
+import com.groom.product.adapter.inbound.web.dto.UpdateProductResponse
 import com.groom.product.application.service.DeleteProductService
 import com.groom.product.application.service.RegisterProductService
 import com.groom.product.application.service.ToggleProductHideService

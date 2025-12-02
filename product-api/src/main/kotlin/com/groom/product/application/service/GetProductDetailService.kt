@@ -2,6 +2,7 @@ package com.groom.product.application.service
 
 import com.groom.product.application.dto.GetProductDetailQuery
 import com.groom.product.application.dto.GetProductDetailResult
+import com.groom.product.common.exception.ProductException
 import com.groom.product.domain.port.LoadProductPort
 import com.groom.product.domain.service.CategoryPathBuilder
 import org.springframework.stereotype.Service
@@ -16,7 +17,7 @@ class GetProductDetailService(
     fun getProductDetail(query: GetProductDetailQuery): GetProductDetailResult {
         val product =
             loadProductPort.loadByIdWithImages(query.productId)
-                ?: throw IllegalArgumentException("Product not found: ${query.productId}")
+                ?: throw ProductException.ProductNotFound(query.productId)
 
         val categoryPath =
             product.categoryId.let {

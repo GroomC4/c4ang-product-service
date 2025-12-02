@@ -1,8 +1,9 @@
 package com.groom.product.domain.service
 
-import com.groom.product.adapter.outbound.persistence.ProductJpaRepository
+import com.groom.product.domain.port.LoadProductPort
+import com.groom.product.domain.port.SaveProductPort
+import com.groom.product.domain.port.StockReservationPort
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.redisson.api.RedissonClient
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -19,8 +20,9 @@ private val logger = KotlinLogging.logger {}
  */
 @Service
 class StockReservationService(
-    private val redissonClient: RedissonClient,
-    private val productRepository: ProductJpaRepository,
+    private val stockReservationPort: StockReservationPort,
+    private val loadProductPort: LoadProductPort,
+    private val saveProductPort: SaveProductPort,
 ) {
     /**
      * 주문 상품들의 재고를 예약합니다.
@@ -40,7 +42,7 @@ class StockReservationService(
 
         // 1. DB에서 상품 재고 확인
         val productIds = items.map { it.productId }
-        val products = productRepository.findAllById(productIds)
+        val products = loadProductPort.loadAllById(productIds)
 
         if (products.size != items.size) {
             val foundIds = products.map { it.id }.toSet()
@@ -67,21 +69,16 @@ class StockReservationService(
 
         for (item in items) {
             val product = products.first { it.id == item.productId }
-            val stockKey = "stock:${item.productId}"
-            val reservationKey = "stock:reservation:$orderId:${item.productId}"
 
             // Redis에서 현재 재고 확인 (없으면 DB 값으로 초기화)
-            val atomicLong = redissonClient.getAtomicLong(stockKey)
-            if (!atomicLong.isExists) {
-                atomicLong.set(product.stockQuantity.toLong())
-            }
+            stockReservationPort.getOrInitializeStock(item.productId, product.stockQuantity)
 
             // 원자적 재고 차감
-            val remainingStock = atomicLong.addAndGet(-item.quantity.toLong())
+            val remainingStock = stockReservationPort.decrementStock(item.productId, item.quantity)
 
             if (remainingStock < 0) {
                 // 재고 부족 - 롤백
-                atomicLong.addAndGet(item.quantity.toLong())
+                stockReservationPort.incrementStock(item.productId, item.quantity)
                 logger.warn { "⚠️  Insufficient stock for product ${item.productId}: requested=${item.quantity}, available=${remainingStock + item.quantity}" }
 
                 failedItems.add(
@@ -95,8 +92,13 @@ class StockReservationService(
                 break
             } else {
                 // 성공 - 예약 정보 저장
-                val reservationBucket = redissonClient.getBucket<Int>(reservationKey)
-                reservationBucket.set(item.quantity, ttlMinutes, TimeUnit.MINUTES)
+                stockReservationPort.saveReservation(
+                    orderId = orderId,
+                    productId = item.productId,
+                    quantity = item.quantity,
+                    ttl = ttlMinutes,
+                    timeUnit = TimeUnit.MINUTES,
+                )
 
                 reservedItems.add(
                     ReservedItem(
@@ -139,22 +141,20 @@ class StockReservationService(
         try {
             for (item in items) {
                 val product =
-                    productRepository.findById(item.productId).orElseThrow {
-                        IllegalArgumentException("Product not found: ${item.productId}")
-                    }
+                    loadProductPort.loadById(item.productId)
+                        ?: throw IllegalArgumentException("Product not found: ${item.productId}")
 
                 // DB 재고 차감
                 try {
                     product.decreaseStock(item.quantity)
-                    productRepository.save(product)
+                    saveProductPort.save(product)
                 } catch (e: IllegalArgumentException) {
                     logger.error { "❌ DB stock became negative for product ${item.productId}: ${e.message}" }
                     return false
                 }
 
                 // Redis 예약 정보 삭제
-                val reservationKey = "stock:reservation:$orderId:${item.productId}"
-                redissonClient.getBucket<Int>(reservationKey).delete()
+                stockReservationPort.deleteReservation(orderId, item.productId)
             }
 
             logger.info { "✅ Stock confirmed for orderId: $orderId" }
@@ -178,12 +178,8 @@ class StockReservationService(
         logger.warn { "🔄 Rolling back stock reservation for orderId: $orderId" }
 
         for (item in reservedItems) {
-            val stockKey = "stock:${item.productId}"
-            val atomicLong = redissonClient.getAtomicLong(stockKey)
-            atomicLong.addAndGet(item.quantity.toLong())
-
-            val reservationKey = "stock:reservation:$orderId:${item.productId}"
-            redissonClient.getBucket<Int>(reservationKey).delete()
+            stockReservationPort.incrementStock(item.productId, item.quantity)
+            stockReservationPort.deleteReservation(orderId, item.productId)
         }
     }
 

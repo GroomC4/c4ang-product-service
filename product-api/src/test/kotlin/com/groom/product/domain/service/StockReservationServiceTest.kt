@@ -1,30 +1,31 @@
 package com.groom.product.domain.service
 
-import com.groom.product.adapter.outbound.persistence.ProductJpaRepository
 import com.groom.product.common.annotation.UnitTest
 import com.groom.product.domain.model.Product
-import io.kotest.assertions.throwables.shouldThrow
+import com.groom.product.domain.port.LoadProductPort
+import com.groom.product.domain.port.SaveProductPort
+import com.groom.product.domain.port.StockReservationPort
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.redisson.api.RAtomicLong
-import org.redisson.api.RBucket
-import org.redisson.api.RedissonClient
 import java.math.BigDecimal
-import java.util.Optional
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 @UnitTest
 @DisplayName("StockReservationService 단위 테스트")
 class StockReservationServiceTest {
-    private lateinit var redissonClient: RedissonClient
-    private lateinit var productRepository: ProductJpaRepository
+    private lateinit var stockReservationPort: StockReservationPort
+    private lateinit var loadProductPort: LoadProductPort
+    private lateinit var saveProductPort: SaveProductPort
     private lateinit var stockService: StockReservationService
 
     private val testOrderId = UUID.randomUUID()
@@ -35,9 +36,10 @@ class StockReservationServiceTest {
 
     @BeforeEach
     fun setup() {
-        redissonClient = mockk(relaxed = true)
-        productRepository = mockk(relaxed = true)
-        stockService = StockReservationService(redissonClient, productRepository)
+        stockReservationPort = mockk(relaxed = true)
+        loadProductPort = mockk(relaxed = true)
+        saveProductPort = mockk(relaxed = true)
+        stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort)
     }
 
     @Nested
@@ -63,15 +65,10 @@ class StockReservationServiceTest {
                     stockQuantity = 100,
                 )
 
-            every { productRepository.findAllById(listOf(testProductId1)) } returns listOf(product)
-
-            val atomicLong = mockk<RAtomicLong>(relaxed = true)
-            every { atomicLong.isExists } returns false
-            every { atomicLong.addAndGet(-10L) } returns 90L
-            every { redissonClient.getAtomicLong(any()) } returns atomicLong
-
-            val bucket = mockk<RBucket<Int>>(relaxed = true)
-            every { redissonClient.getBucket<Int>(any()) } returns bucket
+            every { loadProductPort.loadAllById(listOf(testProductId1)) } returns listOf(product)
+            every { stockReservationPort.getOrInitializeStock(testProductId1, 100) } returns 100L
+            every { stockReservationPort.decrementStock(testProductId1, 10) } returns 90L
+            every { stockReservationPort.saveReservation(testOrderId, testProductId1, 10, 15, TimeUnit.MINUTES) } just runs
 
             // When
             val result = stockService.reserveStock(testOrderId, items)
@@ -84,9 +81,9 @@ class StockReservationServiceTest {
             successResult.reservedItems[0].quantity shouldBe 10
             successResult.reservedItems[0].reservedStock shouldBe 90
 
-            verify { atomicLong.set(100L) }
-            verify { atomicLong.addAndGet(-10L) }
-            verify { bucket.set(10, 15, any()) }
+            verify { stockReservationPort.getOrInitializeStock(testProductId1, 100) }
+            verify { stockReservationPort.decrementStock(testProductId1, 10) }
+            verify { stockReservationPort.saveReservation(testOrderId, testProductId1, 10, 15, TimeUnit.MINUTES) }
         }
 
         @Test
@@ -109,13 +106,10 @@ class StockReservationServiceTest {
                     stockQuantity = 100,
                 )
 
-            every { productRepository.findAllById(listOf(testProductId1)) } returns listOf(product)
-
-            val atomicLong = mockk<RAtomicLong>(relaxed = true)
-            every { atomicLong.isExists } returns false
-            every { atomicLong.addAndGet(-150L) } returns -50L
-            every { atomicLong.addAndGet(150L) } returns 100L // 롤백
-            every { redissonClient.getAtomicLong(any()) } returns atomicLong
+            every { loadProductPort.loadAllById(listOf(testProductId1)) } returns listOf(product)
+            every { stockReservationPort.getOrInitializeStock(testProductId1, 100) } returns 100L
+            every { stockReservationPort.decrementStock(testProductId1, 150) } returns -50L
+            every { stockReservationPort.incrementStock(testProductId1, 150) } returns 100L
 
             // When
             val result = stockService.reserveStock(testOrderId, items)
@@ -130,8 +124,8 @@ class StockReservationServiceTest {
             failureResult.failedItems[0].availableStock shouldBe 100
             failureResult.reason shouldBe "재고 부족"
 
-            verify { atomicLong.addAndGet(-150L) }
-            verify { atomicLong.addAndGet(150L) } // 롤백 확인
+            verify { stockReservationPort.decrementStock(testProductId1, 150) }
+            verify { stockReservationPort.incrementStock(testProductId1, 150) } // 롤백 확인
         }
 
         @Test
@@ -143,7 +137,7 @@ class StockReservationServiceTest {
                     StockReservationService.OrderItem(testProductId1, 10),
                 )
 
-            every { productRepository.findAllById(listOf(testProductId1)) } returns emptyList()
+            every { loadProductPort.loadAllById(listOf(testProductId1)) } returns emptyList()
 
             // When
             val result = stockService.reserveStock(testOrderId, items)
@@ -189,27 +183,15 @@ class StockReservationServiceTest {
                     stockQuantity = 50,
                 )
 
-            every { productRepository.findAllById(listOf(testProductId1, testProductId2)) } returns
-                listOf(
-                    product1,
-                    product2,
-                )
-
-            val atomicLong1 = mockk<RAtomicLong>(relaxed = true)
-            val atomicLong2 = mockk<RAtomicLong>(relaxed = true)
-
-            every { atomicLong1.isExists } returns false
-            every { atomicLong1.addAndGet(-10L) } returns 90L
-            every { atomicLong1.addAndGet(10L) } returns 100L // 롤백
-
-            every { atomicLong2.isExists } returns false
-            every { atomicLong2.addAndGet(-200L) } returns -150L
-
-            every { redissonClient.getAtomicLong("stock:$testProductId1") } returns atomicLong1
-            every { redissonClient.getAtomicLong("stock:$testProductId2") } returns atomicLong2
-
-            val bucket = mockk<RBucket<Int>>(relaxed = true)
-            every { redissonClient.getBucket<Int>(any()) } returns bucket
+            every { loadProductPort.loadAllById(listOf(testProductId1, testProductId2)) } returns listOf(product1, product2)
+            every { stockReservationPort.getOrInitializeStock(testProductId1, 100) } returns 100L
+            every { stockReservationPort.decrementStock(testProductId1, 10) } returns 90L
+            every { stockReservationPort.saveReservation(testOrderId, testProductId1, 10, 15, TimeUnit.MINUTES) } just runs
+            every { stockReservationPort.getOrInitializeStock(testProductId2, 50) } returns 50L
+            every { stockReservationPort.decrementStock(testProductId2, 200) } returns -150L
+            every { stockReservationPort.incrementStock(testProductId2, 200) } returns 50L
+            every { stockReservationPort.incrementStock(testProductId1, 10) } returns 100L
+            every { stockReservationPort.deleteReservation(testOrderId, testProductId1) } just runs
 
             // When
             val result = stockService.reserveStock(testOrderId, items)
@@ -218,8 +200,8 @@ class StockReservationServiceTest {
             result.shouldBeInstanceOf<StockReservationService.ReservationResult.Failure>()
 
             // product1의 예약이 롤백되었는지 확인
-            verify { atomicLong1.addAndGet(10L) }
-            verify { bucket.delete() }
+            verify { stockReservationPort.incrementStock(testProductId1, 10) }
+            verify { stockReservationPort.deleteReservation(testOrderId, testProductId1) }
         }
     }
 
@@ -246,19 +228,17 @@ class StockReservationServiceTest {
                     stockQuantity = 100,
                 )
 
-            every { productRepository.findById(testProductId1) } returns Optional.of(product)
-            every { productRepository.save(any()) } returns product
-
-            val bucket = mockk<RBucket<Int>>(relaxed = true)
-            every { redissonClient.getBucket<Int>(any()) } returns bucket
+            every { loadProductPort.loadById(testProductId1) } returns product
+            every { saveProductPort.save(any()) } returns product
+            every { stockReservationPort.deleteReservation(testOrderId, testProductId1) } just runs
 
             // When
             val result = stockService.confirmStock(testOrderId, items)
 
             // Then
             result shouldBe true
-            verify { productRepository.save(any()) }
-            verify { bucket.delete() }
+            verify { saveProductPort.save(any()) }
+            verify { stockReservationPort.deleteReservation(testOrderId, testProductId1) }
         }
 
         @Test
@@ -270,7 +250,7 @@ class StockReservationServiceTest {
                     StockReservationService.OrderItem(testProductId1, 10),
                 )
 
-            every { productRepository.findById(testProductId1) } returns Optional.empty()
+            every { loadProductPort.loadById(testProductId1) } returns null
 
             // When
             val result = stockService.confirmStock(testOrderId, items)
@@ -299,7 +279,7 @@ class StockReservationServiceTest {
                     stockQuantity = 100,
                 )
 
-            every { productRepository.findById(testProductId1) } returns Optional.of(product)
+            every { loadProductPort.loadById(testProductId1) } returns product
 
             // When
             val result = stockService.confirmStock(testOrderId, items)

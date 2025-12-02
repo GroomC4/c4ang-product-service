@@ -78,8 +78,11 @@ feign:
         readTimeout: 5000
         loggerLevel: full
 
-# Kafka Topic 설정 (커스텀)
+# Kafka 설정 (커스텀)
 kafka:
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  schema-registry:
+    url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
   topics:
     product-registered: product.registered
     product-deleted: product.deleted
