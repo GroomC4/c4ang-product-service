@@ -14,11 +14,6 @@ val platformCoreVersion = "2.3.0"
 val springCloudContractVersion = "4.1.4"
 
 dependencies {
-    // Platform Core - Production (datasource configuration)
-    implementation("com.groom.platform:datasource-starter:$platformCoreVersion")
-
-    // Platform Core - Test only (testcontainers configuration)
-    testImplementation("com.groom.platform:testcontainers-starter:$platformCoreVersion")
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -47,10 +42,6 @@ dependencies {
     // Redisson (Redis 클라이언트 with 원자적 연산 지원)
     implementation("org.redisson:redisson-spring-boot-starter:3.24.3")
 
-    // AWS SDK for S3
-    implementation(platform("software.amazon.awssdk:bom:2.20.26"))
-    implementation("software.amazon.awssdk:s3")
-
     // Database
     runtimeOnly("org.postgresql:postgresql")
     implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.3")
@@ -68,45 +59,15 @@ dependencies {
     // Platform Core - Testcontainers (테스트 전용)
     testImplementation("io.github.groomc4:testcontainers-starter:$platformCoreVersion")
 
+    // Spring Cloud Contract (Provider-side testing)
+    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier:$springCloudContractVersion")
+    testImplementation("io.rest-assured:rest-assured:5.3.2")
+    testImplementation("io.rest-assured:spring-mock-mvc:5.3.2")
+
     // Spring Cloud Contract Stub Runner (Consumer Contract Test)
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
     // Feign Jackson for contract tests
     testImplementation("io.github.openfeign:feign-jackson:13.1")
-    // Spring Cloud Contract
-    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier:$springCloudContractVersion")
-    testImplementation("io.rest-assured:rest-assured:5.3.2")
-    testImplementation("io.rest-assured:spring-mock-mvc:5.3.2")
-}
-
-// Spring Cloud Contract 설정
-contracts {
-    testMode.set(org.springframework.cloud.contract.verifier.config.TestMode.MOCKMVC)
-    baseClassForTests.set("com.groom.product.common.ContractTestBase")
-    contractsDslDir.set(file("src/test/resources/contracts"))
-}
-
-// Contract Stub 발행 설정 (Consumer가 사용할 수 있도록 GitHub Packages에 발행)
-publishing {
-    publications {
-        create<MavenPublication>("stubs") {
-            groupId = "com.groom"
-            artifactId = "product-service-contract-stubs"
-            version = project.version.toString()
-
-            artifact(tasks.named("verifierStubsJar"))
-        }
-    }
-
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-product-service")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
 }
 
 // 모든 Test 태스크에 공통 설정 적용
@@ -181,4 +142,41 @@ val dockerComposeDown by tasks.registering(Exec::class) {
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     dependsOn(dockerComposeUp)
     finalizedBy(dockerComposeDown)
+}
+
+// Spring Cloud Contract 설정 (Provider Contract Test)
+contracts {
+    testMode.set(org.springframework.cloud.contract.verifier.config.TestMode.MOCKMVC)
+    baseClassForTests.set("com.groom.product.common.ContractTestBase")
+    // Service API와 Internal API 모두 포함
+    contractsDslDir.set(file("src/test/resources"))
+    // contracts.service-api와 contracts.internal 디렉토리 모두 사용
+    baseClassMappings.apply {
+        baseClassMapping(".*contracts\\.internal.*", "com.groom.product.common.ContractTestBase")
+    }
+}
+
+// Contract Stub 발행 설정 (Consumer가 사용할 수 있도록 GitHub Packages에 발행)
+publishing {
+    publications {
+        create<MavenPublication>("stubs") {
+            groupId = "com.groom"
+            artifactId = "product-service-contract-stubs"
+            version = project.version.toString()
+
+            // Contract Stub JAR을 발행
+            artifact(tasks.named("verifierStubsJar"))
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/GroomC4/c4ang-packages-hub")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") as String?
+                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.key") as String?
+            }
+        }
+    }
 }
