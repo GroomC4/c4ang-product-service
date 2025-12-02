@@ -78,14 +78,17 @@ StoreInternalDto
 
 Store Service의 Internal API 계약을 검증하는 Consumer Contract Test가 구현되어 있습니다.
 
-- **Contract 파일**: `src/test/resources/contracts/store-service/`
-  - `stores/get/should_get_store_by_id.yml` - 스토어 ID로 조회 성공 케이스
-  - `stores/get/should_return_404_when_store_not_found.yml` - 스토어 미존재 시 404 케이스
-  - `stores/owner/should_get_store_by_owner_id.yml` - 소유자 ID로 조회 성공 케이스
-  - `stores/owner/should_return_null_when_owner_has_no_store.yml` - 소유자 스토어 미존재 시 404 케이스
-- **테스트 파일**: `adapter/outbound/client/StoreServiceFeignClientConsumerContractTest.kt`
-- **Stub 아티팩트**: `com.groom:store-service-contract-stubs`
-- **Stub 저장소**: GitHub Packages (`GroomC4/c4ang-store-service`)
+**Contract 정의 위치** (store-service 저장소):
+- `store-api/src/test/resources/contracts.internal/`
+  - `get/should_get_store_by_id.yml` - 스토어 ID로 조회 성공 케이스
+  - `get/should_return_404_when_store_not_found.yml` - 스토어 미존재 시 404 케이스
+  - `owner/should_get_store_by_owner_id.yml` - 소유자 ID로 조회 성공 케이스
+  - `owner/should_return_404_when_owner_has_no_store.yml` - 소유자 스토어 미존재 시 404 케이스
+
+**Consumer Test** (product-service):
+- 테스트 파일: `adapter/outbound/client/StoreInternalApiConsumerContractTest.kt`
+- Stub 아티팩트: `com.groom:store-service-contract-stubs`
+- Stub 저장소: GitHub Packages (`GroomC4/c4ang-packages-hub`)
 
 ---
 
