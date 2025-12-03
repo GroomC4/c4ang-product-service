@@ -16,7 +16,10 @@ import java.util.concurrent.TimeUnit
 class RedisStockReservationAdapter(
     private val redissonClient: RedissonClient,
 ) : StockReservationPort {
-    override fun getOrInitializeStock(productId: UUID, initialStock: Int): Long {
+    override fun getOrInitializeStock(
+        productId: UUID,
+        initialStock: Int,
+    ): Long {
         val stockKey = "stock:$productId"
         val atomicLong = redissonClient.getAtomicLong(stockKey)
         if (!atomicLong.isExists) {
@@ -25,13 +28,19 @@ class RedisStockReservationAdapter(
         return atomicLong.get()
     }
 
-    override fun decrementStock(productId: UUID, quantity: Int): Long {
+    override fun decrementStock(
+        productId: UUID,
+        quantity: Int,
+    ): Long {
         val stockKey = "stock:$productId"
         val atomicLong = redissonClient.getAtomicLong(stockKey)
         return atomicLong.addAndGet(-quantity.toLong())
     }
 
-    override fun incrementStock(productId: UUID, quantity: Int): Long {
+    override fun incrementStock(
+        productId: UUID,
+        quantity: Int,
+    ): Long {
         val stockKey = "stock:$productId"
         val atomicLong = redissonClient.getAtomicLong(stockKey)
         return atomicLong.addAndGet(quantity.toLong())
@@ -50,7 +59,10 @@ class RedisStockReservationAdapter(
         reservationBucket.set(quantity, duration)
     }
 
-    override fun deleteReservation(orderId: UUID, productId: UUID) {
+    override fun deleteReservation(
+        orderId: UUID,
+        productId: UUID,
+    ) {
         val reservationKey = "stock:reservation:$orderId:$productId"
         redissonClient.getBucket<Int>(reservationKey).delete()
     }

@@ -29,17 +29,18 @@ class KafkaProducerConfig {
 
     @Bean
     fun producerFactory(): ProducerFactory<String, Any> {
-        val configProps = mapOf(
-            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
-            ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
-            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to KafkaAvroSerializer::class.java,
-            "schema.registry.url" to schemaRegistryUrl,
-            ProducerConfig.ACKS_CONFIG to "all",
-            ProducerConfig.RETRIES_CONFIG to 3,
-            ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG to true,
-            ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION to 5,
-            ProducerConfig.COMPRESSION_TYPE_CONFIG to "snappy",
-        )
+        val configProps =
+            mapOf(
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to KafkaAvroSerializer::class.java,
+                "schema.registry.url" to schemaRegistryUrl,
+                ProducerConfig.ACKS_CONFIG to "all",
+                ProducerConfig.RETRIES_CONFIG to 3,
+                ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG to true,
+                ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION to 5,
+                ProducerConfig.COMPRESSION_TYPE_CONFIG to "snappy",
+            )
         return DefaultKafkaProducerFactory(configProps)
     }
 

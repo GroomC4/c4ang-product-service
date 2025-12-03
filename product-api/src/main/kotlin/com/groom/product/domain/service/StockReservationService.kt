@@ -79,7 +79,9 @@ class StockReservationService(
             if (remainingStock < 0) {
                 // 재고 부족 - 롤백
                 stockReservationPort.incrementStock(item.productId, item.quantity)
-                logger.warn { "⚠️  Insufficient stock for product ${item.productId}: requested=${item.quantity}, available=${remainingStock + item.quantity}" }
+                logger.warn {
+                    "⚠️  Insufficient stock for product ${item.productId}: requested=${item.quantity}, available=${remainingStock + item.quantity}"
+                }
 
                 failedItems.add(
                     FailedItem(
@@ -201,8 +203,13 @@ class StockReservationService(
     )
 
     sealed class ReservationResult {
-        data class Success(val reservedItems: List<ReservedItem>) : ReservationResult()
+        data class Success(
+            val reservedItems: List<ReservedItem>,
+        ) : ReservationResult()
 
-        data class Failure(val failedItems: List<FailedItem>, val reason: String) : ReservationResult()
+        data class Failure(
+            val failedItems: List<FailedItem>,
+            val reason: String,
+        ) : ReservationResult()
     }
 }

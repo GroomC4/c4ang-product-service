@@ -33,16 +33,17 @@ class KafkaConsumerConfig {
 
     @Bean
     fun consumerFactory(): ConsumerFactory<String, Any> {
-        val configProps = mapOf(
-            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
-            ConsumerConfig.GROUP_ID_CONFIG to "product-service",
-            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
-            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
-            "schema.registry.url" to schemaRegistryUrl,
-            KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG to true,
-            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
-            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
-        )
+        val configProps =
+            mapOf(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
+                ConsumerConfig.GROUP_ID_CONFIG to "product-service",
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to KafkaAvroDeserializer::class.java,
+                "schema.registry.url" to schemaRegistryUrl,
+                KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG to true,
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
+                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
+            )
         return DefaultKafkaConsumerFactory(configProps)
     }
 

@@ -52,7 +52,8 @@ class StockEventProducer(
                 ).setReservedAt(Instant.now().toEpochMilli())
                 .build()
 
-        kafkaTemplate.send("stock.reserved", orderId.toString(), event)
+        kafkaTemplate
+            .send("stock.reserved", orderId.toString(), event)
             .whenComplete { result, ex ->
                 if (ex == null) {
                     logger.info { "✅ Published stock.reserved event - orderId: $orderId, offset: ${result?.recordMetadata?.offset()}" }
@@ -93,10 +94,13 @@ class StockEventProducer(
                 .setFailedAt(Instant.now().toEpochMilli())
                 .build()
 
-        kafkaTemplate.send("stock.reservation.failed", orderId.toString(), event)
+        kafkaTemplate
+            .send("stock.reservation.failed", orderId.toString(), event)
             .whenComplete { result, ex ->
                 if (ex == null) {
-                    logger.info { "✅ Published stock.reservation.failed event - orderId: $orderId, offset: ${result?.recordMetadata?.offset()}" }
+                    logger.info {
+                        "✅ Published stock.reservation.failed event - orderId: $orderId, offset: ${result?.recordMetadata?.offset()}"
+                    }
                 } else {
                     logger.error(ex) { "❌ Failed to publish stock.reservation.failed event - orderId: $orderId" }
                 }
