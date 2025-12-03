@@ -1,8 +1,0 @@
-# Internal API Contracts Directory
-#
-# RAG 서비스 등 다른 마이크로서비스에서 호출하는 Internal API의 Contract를 관리합니다.
-# 예시: GET /internal/v1/products/{productId}
-#
-# Contract 파일 작성 예시:
-# - get/should_get_product_by_id.yml
-# - get/should_return_404_when_product_not_found.yml

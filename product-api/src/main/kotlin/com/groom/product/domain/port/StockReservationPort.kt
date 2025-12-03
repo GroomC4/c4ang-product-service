@@ -17,7 +17,10 @@ interface StockReservationPort {
      * @param initialStock 캐시에 없을 경우 초기화할 재고 수량
      * @return 현재 재고 수량
      */
-    fun getOrInitializeStock(productId: UUID, initialStock: Int): Long
+    fun getOrInitializeStock(
+        productId: UUID,
+        initialStock: Int,
+    ): Long
 
     /**
      * 원자적으로 재고를 차감합니다.
@@ -26,7 +29,10 @@ interface StockReservationPort {
      * @param quantity 차감할 수량
      * @return 차감 후 남은 재고
      */
-    fun decrementStock(productId: UUID, quantity: Int): Long
+    fun decrementStock(
+        productId: UUID,
+        quantity: Int,
+    ): Long
 
     /**
      * 원자적으로 재고를 증가합니다 (롤백 시 사용).
@@ -35,7 +41,10 @@ interface StockReservationPort {
      * @param quantity 증가할 수량
      * @return 증가 후 재고
      */
-    fun incrementStock(productId: UUID, quantity: Int): Long
+    fun incrementStock(
+        productId: UUID,
+        quantity: Int,
+    ): Long
 
     /**
      * 예약 정보를 저장합니다.
@@ -60,5 +69,8 @@ interface StockReservationPort {
      * @param orderId 주문 ID
      * @param productId 상품 ID
      */
-    fun deleteReservation(orderId: UUID, productId: UUID)
+    fun deleteReservation(
+        orderId: UUID,
+        productId: UUID,
+    )
 }

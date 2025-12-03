@@ -128,7 +128,8 @@ class PaymentCompletedConsumer(
                 ).setConfirmedAt(Instant.now().toEpochMilli())
                 .build()
 
-        kafkaTemplate.send("stock.confirmed", orderId.toString(), event)
+        kafkaTemplate
+            .send("stock.confirmed", orderId.toString(), event)
             .whenComplete { result, ex ->
                 if (ex == null) {
                     logger.info { "✅ Published stock.confirmed event - orderId: $orderId, offset: ${result?.recordMetadata?.offset()}" }
@@ -154,10 +155,13 @@ class PaymentCompletedConsumer(
                 .setFailedAt(Instant.now().toEpochMilli())
                 .build()
 
-        kafkaTemplate.send("stock.confirmation.failed", orderId.toString(), event)
+        kafkaTemplate
+            .send("stock.confirmation.failed", orderId.toString(), event)
             .whenComplete { result, ex ->
                 if (ex == null) {
-                    logger.info { "✅ Published stock.confirmation.failed event - orderId: $orderId, offset: ${result?.recordMetadata?.offset()}" }
+                    logger.info {
+                        "✅ Published stock.confirmation.failed event - orderId: $orderId, offset: ${result?.recordMetadata?.offset()}"
+                    }
                 } else {
                     logger.error(ex) { "❌ Failed to publish stock.confirmation.failed event - orderId: $orderId" }
                 }

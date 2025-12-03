@@ -1,0 +1,36 @@
+name: order_service_get_product_by_id_success
+description: |
+  Consumer: order-service
+  Purpose: 주문 시 상품 정보 조회 (id, storeId, name, storeName, price)
+
+request:
+  method: GET
+  url: /internal/v1/products/550e8400-e29b-41d4-a716-446655440000
+  headers:
+    Content-Type: application/json
+
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    id: "550e8400-e29b-41d4-a716-446655440000"
+    storeId: "660e8400-e29b-41d4-a716-446655440001"
+    name: "아메리카노"
+    storeName: "스타벅스 강남점"
+    price: 4500.00
+  matchers:
+    body:
+      - path: $.id
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.storeId
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.name
+        type: by_type
+      - path: $.storeName
+        type: by_type
+      - path: $.price
+        type: by_regex
+        value: "[0-9]+\\.?[0-9]*"

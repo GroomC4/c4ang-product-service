@@ -1,0 +1,23 @@
+name: order_service_get_product_by_id_not_found
+description: |
+  Consumer: order-service
+  Purpose: 존재하지 않는 상품 조회 시 404 응답
+
+request:
+  method: GET
+  url: /internal/v1/products/99999999-9999-9999-9999-999999999999
+  headers:
+    Content-Type: application/json
+
+response:
+  status: 404
+  headers:
+    Content-Type: application/json
+  body:
+    error: "PRODUCT_NOT_FOUND"
+    message: "Product not found with id: 99999999-9999-9999-9999-999999999999"
+  matchers:
+    body:
+      - path: $.message
+        type: by_regex
+        value: "Product not found.*"
