@@ -15,12 +15,19 @@ import org.springframework.test.context.jdbc.SqlGroup
 import org.springframework.web.context.WebApplicationContext
 
 /**
- * Spring Cloud Contract Test를 위한 Base 클래스
+ * Spring Cloud Contract Test를 위한 Base 클래스 (Producer-side)
  *
  * Contract 파일(YAML)을 기반으로 자동 생성된 테스트가 이 클래스를 상속받습니다.
  * - Provider 측(product-service)에서 Contract를 검증
  * - Testcontainers를 사용하여 실제 DB, Redis, Kafka 환경에서 테스트
  * - 각 테스트 전에 테스트 데이터를 로드하고, 후에 정리
+ *
+ * Producer Contract Test vs Consumer Contract Test:
+ * - Producer: MockMvc로 실제 API 호출 → DB, Redis 등 인프라 필요 (test 프로필)
+ * - Consumer: Stub Runner로 WireMock 호출 → 인프라 불필요 (consumer-contract-test 프로필)
+ *
+ * 실행 방법:
+ * - ./gradlew contractTest
  *
  * 참고: IntegrationTestBase를 상속받지 않고 직접 어노테이션을 선언하여
  * Contract Test 전용 설정을 사용합니다.
@@ -31,15 +38,15 @@ import org.springframework.web.context.WebApplicationContext
     properties = [
         "spring.profiles.active=test",
 
-        // PostgreSQL
+        // PostgreSQL (Internal API Contract 검증에 필요)
         "testcontainers.postgres.enabled=true",
         "testcontainers.postgres.replica-enabled=true",
         "testcontainers.postgres.schema-location=project:sql/schema.sql",
 
-        // Redis
+        // Redis (재고 관련 API 검증에 필요)
         "testcontainers.redis.enabled=true",
 
-        // Kafka
+        // Kafka (Internal API Contract 검증에는 불필요하나, 애플리케이션 컨텍스트 로드에 필요)
         "testcontainers.kafka.enabled=true",
         "testcontainers.kafka.auto-create-topics=true",
 
