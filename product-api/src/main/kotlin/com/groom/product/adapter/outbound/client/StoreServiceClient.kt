@@ -21,12 +21,4 @@ interface StoreServiceClient {
      * @return StoreInternalDto - 스토어 정보
      */
     fun getById(storeId: UUID): StoreInternalDto
-
-    /**
-     * 소유자의 스토어 정보 조회
-     *
-     * @param ownerId 소유자 ID
-     * @return StoreInternalDto - 스토어 정보 (존재하지 않으면 null)
-     */
-    fun getByOwnerId(ownerId: UUID): StoreInternalDto?
 }

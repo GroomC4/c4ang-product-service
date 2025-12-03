@@ -1,0 +1,32 @@
+# Consumer Contract Test 전용 프로필
+# 인프라 의존성 없이 WireMock stub만 사용하여 테스트 실행
+
+logging:
+  level:
+    root: INFO
+    com.groom.product: DEBUG
+    org.springframework.cloud.contract: DEBUG
+
+# Testcontainers 비활성화 (인프라 불필요)
+testcontainers:
+  postgres:
+    enabled: false
+  redis:
+    enabled: false
+  kafka:
+    enabled: false
+
+# Spring 자동 설정 제외 (DB, Redis, Kafka 등)
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+      - org.redisson.spring.starter.RedissonAutoConfigurationV2
+
+# Stub Runner 설정
+stubrunner:
+  ids-to-service-ids:
+    store-service-contract-stubs: store-service

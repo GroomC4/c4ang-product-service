@@ -34,18 +34,4 @@ interface StoreServiceFeignClient : StoreServiceClient {
     override fun getById(
         @PathVariable storeId: UUID,
     ): StoreInternalDto
-
-    /**
-     * 소유자의 스토어 정보 조회
-     *
-     * Store Service의 Internal API를 호출합니다.
-     * 엔드포인트: GET /internal/v1/stores/owner/{ownerId}
-     *
-     * @param ownerId 소유자 ID
-     * @return StoreInternalDto - 스토어 정보
-     */
-    @GetMapping("/internal/v1/stores/owner/{ownerId}")
-    override fun getByOwnerId(
-        @PathVariable ownerId: UUID,
-    ): StoreInternalDto?
 }

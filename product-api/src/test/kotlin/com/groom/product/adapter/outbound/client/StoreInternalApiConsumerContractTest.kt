@@ -13,12 +13,14 @@ import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.contract.stubrunner.StubFinder
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties
 import org.springframework.cloud.openfeign.support.SpringMvcContract
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import java.util.UUID
 
@@ -28,7 +30,18 @@ import java.util.UUID
  * store-service의 Internal API 계약을 검증하는 Consumer Contract Test
  *
  * 이 테스트는 store-service가 contract stub을 발행한 후에만 실행됩니다.
+ *
+ * 실행 방법:
+ * ```
+ * ./gradlew :product-api:consumerContractTest
+ * ```
+ *
+ * 특징:
+ * - consumer-contract-test 프로필 사용 (인프라 의존성 없음)
+ * - WireMock stub만 사용하여 빠른 테스트 실행
  */
+@Tag("consumer-contract-test")
+@ActiveProfiles("consumer-contract-test")
 @SpringJUnitConfig
 @AutoConfigureStubRunner(
     ids = ["com.groom:store-service-contract-stubs:+:stubs"],
@@ -87,37 +100,6 @@ class StoreInternalApiConsumerContractTest {
             val exception =
                 shouldThrow<FeignException.NotFound> {
                     storeServiceClient.getById(nonExistentStoreId)
-                }
-
-            exception.status() shouldBe 404
-        }
-    }
-
-    @Nested
-    @DisplayName("GET /internal/v1/stores/owner/{ownerId}")
-    inner class GetStoreByOwnerId {
-        @Test
-        @DisplayName("소유자 ID로 스토어 조회 성공")
-        fun `should get store by owner id successfully`() {
-            val ownerId = UUID.fromString("750e8400-e29b-41d4-a716-446655440001")
-
-            val result = storeServiceClient.getByOwnerId(ownerId)
-
-            result shouldNotBe null
-            result!!.storeId shouldBe "750e8400-e29b-41d4-a716-446655440101"
-            result.ownerUserId shouldBe "750e8400-e29b-41d4-a716-446655440001"
-            result.name shouldBe "Contract Test Store"
-            result.status shouldBe "REGISTERED"
-        }
-
-        @Test
-        @DisplayName("스토어가 없는 소유자 조회 시 404 응답")
-        fun `should return 404 when owner has no store`() {
-            val ownerWithNoStore = UUID.fromString("00000000-0000-0000-0000-000000000000")
-
-            val exception =
-                shouldThrow<FeignException.NotFound> {
-                    storeServiceClient.getByOwnerId(ownerWithNoStore)
                 }
 
             exception.status() shouldBe 404

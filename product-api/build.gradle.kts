@@ -103,7 +103,11 @@ tasks.withType<Test> {
 }
 
 tasks.test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        // Consumer Contract Test는 별도 태스크(consumerContractTest)로 실행
+        // stub이 발행되지 않은 상태에서 실패하므로 일반 test에서는 제외
+        excludeTags("consumer-contract-test")
+    }
 }
 
 // 통합 테스트 전용 태스크 (Docker Compose 기반)
@@ -124,6 +128,27 @@ val integrationTest by tasks.registering(Test::class) {
     }
 
     shouldRunAfter(tasks.test)
+}
+
+// Consumer Contract Test 전용 태스크 (인프라 의존성 없음, WireMock stub만 사용)
+val consumerContractTest by tasks.registering(Test::class) {
+    description = "Runs consumer contract tests with WireMock stubs (no infrastructure required)"
+    group = "verification"
+
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+
+    // consumer-contract-test 프로필 활성화
+    systemProperty("spring.profiles.active", "consumer-contract-test")
+
+    useJUnitPlatform {
+        includeTags("consumer-contract-test")
+    }
+
+    testLogging {
+        events("passed", "skipped", "failed")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
 }
 
 // Docker Compose 연동 태스크 추가

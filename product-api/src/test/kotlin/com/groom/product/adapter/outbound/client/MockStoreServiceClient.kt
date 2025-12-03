@@ -70,7 +70,7 @@ class MockStoreServiceClient : StoreServiceClient {
                 "Store not found: $storeId",
                 Request.create(
                     Request.HttpMethod.GET,
-                    "/api/v1/stores/$storeId",
+                    "/internal/v1/stores/$storeId",
                     emptyMap(),
                     null,
                     RequestTemplate(),
@@ -78,6 +78,4 @@ class MockStoreServiceClient : StoreServiceClient {
                 null,
                 emptyMap(),
             )
-
-    override fun getByOwnerId(ownerId: UUID): StoreInternalDto? = testStores.values.find { it.ownerUserId == ownerId.toString() }
 }
