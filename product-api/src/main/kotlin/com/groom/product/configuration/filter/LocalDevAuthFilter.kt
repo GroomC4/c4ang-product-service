@@ -1,4 +1,4 @@
-package com.groom.product.common.config
+package com.groom.product.configuration.filter
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest

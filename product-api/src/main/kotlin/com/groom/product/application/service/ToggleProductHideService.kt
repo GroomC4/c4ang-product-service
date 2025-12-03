@@ -2,7 +2,7 @@ package com.groom.product.application.service
 
 import com.groom.product.application.dto.ToggleProductHideCommand
 import com.groom.product.application.dto.ToggleProductHideResult
-import com.groom.product.common.domain.DomainEventPublisher
+import com.groom.product.domain.event.DomainEventPublisher
 import com.groom.product.domain.event.ProductHiddenEvent
 import com.groom.product.domain.event.ProductRestoredEvent
 import com.groom.product.domain.port.LoadProductPort

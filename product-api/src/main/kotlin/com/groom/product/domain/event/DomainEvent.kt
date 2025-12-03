@@ -1,4 +1,4 @@
-package com.groom.product.common.domain
+package com.groom.product.domain.event
 
 import java.time.LocalDateTime
 

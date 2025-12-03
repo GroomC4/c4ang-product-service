@@ -2,7 +2,7 @@ package com.groom.product.application.service
 
 import com.groom.product.application.dto.DeleteProductCommand
 import com.groom.product.application.dto.DeleteProductResult
-import com.groom.product.common.domain.DomainEventPublisher
+import com.groom.product.domain.event.DomainEventPublisher
 import com.groom.product.domain.event.ProductDeletedEvent
 import com.groom.product.domain.port.LoadProductPort
 import org.springframework.stereotype.Service

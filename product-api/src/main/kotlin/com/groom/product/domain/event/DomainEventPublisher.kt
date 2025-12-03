@@ -1,4 +1,4 @@
-package com.groom.product.common.domain
+package com.groom.product.domain.event
 
 /**
  * 도메인 이벤트를 발행하는 인터페이스.

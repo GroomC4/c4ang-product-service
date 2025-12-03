@@ -1,6 +1,6 @@
 package com.groom.product.domain.event
 
-import com.groom.product.common.domain.DomainEvent
+import com.groom.product.domain.event.DomainEvent
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
