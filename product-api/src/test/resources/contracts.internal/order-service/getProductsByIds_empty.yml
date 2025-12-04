@@ -4,12 +4,13 @@ description: |
   Purpose: 존재하지 않는 상품 ID 목록 조회 시 빈 배열 반환
 
 request:
-  method: GET
-  url: /internal/v1/products
-  queryParameters:
-    ids: "99999999-9999-9999-9999-999999999999"
+  method: POST
+  url: /internal/v1/products/search
   headers:
     Content-Type: application/json
+  body:
+    ids:
+      - "99999999-9999-9999-9999-999999999999"
 
 response:
   status: 200

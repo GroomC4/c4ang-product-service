@@ -2,6 +2,7 @@ package com.groom.product.adapter.inbound.internal
 
 import com.groom.product.adapter.inbound.internal.dto.InternalProductResponse
 import com.groom.product.adapter.inbound.internal.dto.ProductNotFoundErrorResponse
+import com.groom.product.adapter.inbound.internal.dto.ProductSearchRequest
 import com.groom.product.application.dto.GetProductForOrderQuery
 import com.groom.product.application.dto.GetProductsForOrderQuery
 import com.groom.product.application.service.GetProductForOrderService
@@ -14,8 +15,9 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
@@ -27,7 +29,7 @@ import java.util.UUID
  *
  * Endpoints:
  * - GET /internal/v1/products/{id} - 상품 단건 조회
- * - GET /internal/v1/products?ids=... - 상품 다건 조회
+ * - POST /internal/v1/products/search - 상품 다건 조회
  */
 @Tag(name = "Product Internal API", description = "Internal API for other domain services")
 @RestController
@@ -40,7 +42,7 @@ class ProductInternalController(
      *
      * @param id 상품 ID
      * @return 상품 정보 (id, storeId, name, storeName, price)
-     * @throws ProductException.ProductNotFound 상품을 찾을 수 없는 경우
+     * @throws com.groom.product.common.exception.ProductException.ProductNotFound 상품을 찾을 수 없는 경우
      */
     @Operation(summary = "상품 단건 조회", description = "상품 ID로 상품 정보를 조회합니다.")
     @ApiResponses(
@@ -69,7 +71,7 @@ class ProductInternalController(
     /**
      * 상품 ID 목록으로 상품 다건 조회
      *
-     * @param ids 상품 ID 목록 (쉼표로 구분)
+     * @param request 상품 ID 목록을 담은 요청 DTO
      * @return 상품 정보 목록 (존재하는 상품만 반환, 존재하지 않는 ID는 무시)
      */
     @Operation(summary = "상품 다건 조회", description = "상품 ID 목록으로 상품 정보를 조회합니다. 존재하지 않는 ID는 무시됩니다.")
@@ -81,18 +83,11 @@ class ProductInternalController(
             ),
         ],
     )
-    @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping("/search", produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun getProductsByIds(
-        @RequestParam ids: String,
+        @RequestBody request: ProductSearchRequest,
     ): List<InternalProductResponse> {
-        val productIds =
-            ids
-                .split(",")
-                .map { it.trim() }
-                .filter { it.isNotEmpty() }
-                .mapNotNull { runCatching { UUID.fromString(it) }.getOrNull() }
-
-        val query = GetProductsForOrderQuery(productIds = productIds)
+        val query = GetProductsForOrderQuery(productIds = request.ids)
         val results = getProductForOrderService.getProductsByIds(query)
         return results.map { InternalProductResponse.from(it) }
     }

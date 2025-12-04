@@ -4,12 +4,14 @@ description: |
   Purpose: 주문 시 여러 상품 정보 일괄 조회
 
 request:
-  method: GET
-  url: /internal/v1/products
-  queryParameters:
-    ids: "550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002"
+  method: POST
+  url: /internal/v1/products/search
   headers:
     Content-Type: application/json
+  body:
+    ids:
+      - "550e8400-e29b-41d4-a716-446655440000"
+      - "550e8400-e29b-41d4-a716-446655440002"
 
 response:
   status: 200
