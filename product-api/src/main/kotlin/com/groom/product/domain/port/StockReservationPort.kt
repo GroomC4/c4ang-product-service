@@ -73,4 +73,46 @@ interface StockReservationPort {
         orderId: UUID,
         productId: UUID,
     )
+
+    /**
+     * 예약 정보를 조회합니다.
+     *
+     * @param orderId 주문 ID
+     * @param productId 상품 ID
+     * @return 예약된 수량 (없으면 null)
+     */
+    fun getReservation(
+        orderId: UUID,
+        productId: UUID,
+    ): Int?
+
+    /**
+     * 만료 인덱스에 예약 정보를 등록합니다.
+     *
+     * @param orderId 주문 ID
+     * @param productId 상품 ID
+     * @param quantity 예약 수량
+     * @param expiresAtEpochSecond 만료 시각 (epoch second)
+     */
+    fun registerExpiry(
+        orderId: UUID,
+        productId: UUID,
+        quantity: Int,
+        expiresAtEpochSecond: Long,
+    )
+
+    /**
+     * 만료된 예약 엔트리들을 조회합니다.
+     *
+     * @param nowEpochSecond 현재 시각 (epoch second)
+     * @return 만료된 예약 엔트리 목록 (orderId:productId:quantity 형식)
+     */
+    fun getExpiredEntries(nowEpochSecond: Long): Collection<String>
+
+    /**
+     * 만료 인덱스에서 엔트리를 삭제합니다.
+     *
+     * @param entry 삭제할 엔트리 (orderId:productId:quantity 형식)
+     */
+    fun removeExpiryEntry(entry: String)
 }

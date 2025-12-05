@@ -4,7 +4,7 @@ import com.groom.ecommerce.product.event.avro.ReservedItem
 import com.groom.ecommerce.product.event.avro.StockReserved
 import com.groom.ecommerce.saga.event.avro.FailedItem
 import com.groom.ecommerce.saga.event.avro.StockReservationFailed
-import com.groom.product.domain.service.StockReservationService
+import com.groom.product.application.service.StockReservationService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Component
