@@ -1,4 +1,4 @@
-package com.groom.product.domain.service
+package com.groom.product.application.service
 
 import com.groom.product.domain.port.LoadProductPort
 import com.groom.product.domain.port.SaveProductPort
@@ -6,15 +6,16 @@ import com.groom.product.domain.port.StockReservationPort
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 private val logger = KotlinLogging.logger {}
 
 /**
- * 재고 예약 도메인 서비스
+ * 재고 예약 Application 서비스
  *
- * Redis를 사용하여 원자적 재고 예약을 수행합니다.
+ * Domain과 Port를 오케스트레이션하여 재고 예약 유스케이스를 수행합니다.
  * - Redis Atomic Operations를 통한 동시성 제어
  * - DB 재고 차감은 결제 완료 시 수행 (재고 확정)
  */
@@ -100,6 +101,15 @@ class StockReservationService(
                     quantity = item.quantity,
                     ttl = ttlMinutes,
                     timeUnit = TimeUnit.MINUTES,
+                )
+
+                // 만료 인덱스에 등록 (스케줄러가 만료된 예약을 처리할 수 있도록)
+                val expiresAtEpochSecond = Instant.now().plusSeconds(ttlMinutes * 60).epochSecond
+                stockReservationPort.registerExpiry(
+                    orderId = orderId,
+                    productId = item.productId,
+                    quantity = item.quantity,
+                    expiresAtEpochSecond = expiresAtEpochSecond,
                 )
 
                 reservedItems.add(

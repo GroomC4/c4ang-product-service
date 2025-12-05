@@ -3,8 +3,8 @@ package com.groom.product.application.service
 import com.groom.product.application.dto.GenerateProductDescriptionCommand
 import com.groom.product.application.dto.RegisterProductCommand
 import com.groom.product.application.dto.RegisterProductResult
-import com.groom.product.domain.event.DomainEventPublisher
 import com.groom.product.common.exception.StoreException
+import com.groom.product.domain.event.DomainEventPublisher
 import com.groom.product.domain.event.ProductRegisteredEvent
 import com.groom.product.domain.model.Price
 import com.groom.product.domain.model.ProductDescription

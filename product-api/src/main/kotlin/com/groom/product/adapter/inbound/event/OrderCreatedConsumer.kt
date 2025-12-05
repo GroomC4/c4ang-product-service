@@ -3,8 +3,8 @@ package com.groom.product.adapter.inbound.event
 import com.groom.ecommerce.order.event.avro.OrderCreated
 import com.groom.product.adapter.outbound.event.StockEventProducer
 import com.groom.product.adapter.outbound.persistence.ProcessedEventRepository
+import com.groom.product.application.service.StockReservationService
 import com.groom.product.domain.model.ProcessedEvent
-import com.groom.product.domain.service.StockReservationService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
