@@ -32,16 +32,23 @@ C4ang 이커머스 플랫폼의 **상품 관리 마이크로서비스**입니다
 
 Hexagonal Architecture (Ports and Adapters) 패턴을 따릅니다.
 
+> **상세 문서**: 각 파일의 위치, 책임, 핵심 로직은 [docs/FILE_INDEX.md](docs/FILE_INDEX.md)를 참고하세요.
+
 ```
 product-api/
 └── src/main/kotlin/com/groom/product/
     ├── adapter/                    # 외부 시스템 연동
-    │   ├── inbound/web/           # REST API Controller
+    │   ├── inbound/
+    │   │   ├── web/               # REST API Controller
+    │   │   ├── internal/          # Internal API (타 서비스용)
+    │   │   └── event/             # Kafka Consumer
     │   └── outbound/
     │       ├── persistence/       # JPA Repository
     │       ├── client/            # Feign Client (store-service)
     │       ├── storage/           # S3 Uploader
-    │       └── ai/                # Gemini AI Client
+    │       ├── ai/                # Gemini AI Client
+    │       ├── redis/             # Redis Adapter (재고 예약)
+    │       └── event/             # Kafka Producer
     │
     ├── application/               # 애플리케이션 서비스
     │   ├── service/               # Use Case 구현
@@ -56,10 +63,13 @@ product-api/
     │
     ├── common/                    # 공통 유틸리티
     │   ├── exception/             # 예외 처리
-    │   ├── configuration/         # 설정 프로퍼티
     │   └── util/                  # 유틸리티
     │
     └── configuration/             # 설정 클래스
+        ├── jpa/                   # JPA 설정
+        ├── kafka/                 # Kafka 설정
+        ├── event/                 # 이벤트 설정
+        └── properties/            # 설정 프로퍼티
 ```
 
 ## API 엔드포인트
