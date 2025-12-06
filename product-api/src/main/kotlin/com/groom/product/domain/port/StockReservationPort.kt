@@ -115,4 +115,23 @@ interface StockReservationPort {
      * @param entry 삭제할 엔트리 (orderId:productId:quantity 형식)
      */
     fun removeExpiryEntry(entry: String)
+
+    /**
+     * 특정 주문의 모든 예약 정보를 조회합니다.
+     *
+     * 만료 인덱스에서 orderId로 시작하는 모든 엔트리를 찾아
+     * productId와 quantity 정보를 반환합니다.
+     *
+     * @param orderId 주문 ID
+     * @return 예약된 상품 정보 목록 (productId, quantity)
+     */
+    fun getReservationsByOrderId(orderId: UUID): List<ReservationInfo>
+
+    /**
+     * 예약 정보 데이터 클래스
+     */
+    data class ReservationInfo(
+        val productId: UUID,
+        val quantity: Int,
+    )
 }

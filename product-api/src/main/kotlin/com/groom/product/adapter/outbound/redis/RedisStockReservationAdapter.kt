@@ -111,4 +111,32 @@ class RedisStockReservationAdapter(
         val expirySet = redissonClient.getScoredSortedSet<String>(EXPIRY_INDEX_KEY)
         expirySet.remove(entry)
     }
+
+    override fun getReservationsByOrderId(orderId: UUID): List<StockReservationPort.ReservationInfo> {
+        val expirySet = redissonClient.getScoredSortedSet<String>(EXPIRY_INDEX_KEY)
+
+        // 모든 엔트리를 가져와서 orderId로 필터링
+        // 엔트리 형식: orderId:productId:quantity
+        val orderIdPrefix = "$orderId:"
+
+        return expirySet.readAll()
+            .filter { it.startsWith(orderIdPrefix) }
+            .mapNotNull { entry ->
+                try {
+                    val parts = entry.split(":")
+                    if (parts.size >= 3) {
+                        StockReservationPort.ReservationInfo(
+                            productId = UUID.fromString(parts[1]),
+                            quantity = parts[2].toInt(),
+                        )
+                    } else {
+                        logger.warn { "Invalid expiry entry format: $entry" }
+                        null
+                    }
+                } catch (e: Exception) {
+                    logger.error(e) { "Failed to parse expiry entry: $entry" }
+                    null
+                }
+            }
+    }
 }

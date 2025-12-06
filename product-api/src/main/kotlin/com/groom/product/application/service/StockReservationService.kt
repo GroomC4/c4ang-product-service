@@ -195,6 +195,24 @@ class StockReservationService(
         }
     }
 
+    /**
+     * orderId로 예약된 상품 정보를 조회합니다.
+     *
+     * @param orderId 주문 ID
+     * @return 예약된 상품 목록
+     */
+    fun getReservedItems(orderId: UUID): List<OrderItem> {
+        val reservations = stockReservationPort.getReservationsByOrderId(orderId)
+        logger.info { "📦 Retrieved ${reservations.size} reservations for orderId: $orderId" }
+
+        return reservations.map { reservation ->
+            OrderItem(
+                productId = reservation.productId,
+                quantity = reservation.quantity,
+            )
+        }
+    }
+
     data class OrderItem(
         val productId: UUID,
         val quantity: Int,

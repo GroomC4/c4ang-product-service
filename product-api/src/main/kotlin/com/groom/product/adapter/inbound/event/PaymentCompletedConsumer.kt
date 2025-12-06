@@ -64,15 +64,24 @@ class PaymentCompletedConsumer(
         }
 
         try {
-            // NOTE: PaymentCompleted 이벤트에는 상품 아이템 정보가 없으므로
-            // Order Service와의 동기화를 위해 별도 조회가 필요할 수 있습니다.
-            // 여기서는 간단히 Redis 예약 정보를 기반으로 처리합니다.
-            // 실제 구현에서는 p_stock_reservation_log 테이블을 조회하거나
-            // Order Service API를 호출하여 주문 상품 정보를 가져와야 합니다.
+            // Redis의 만료 인덱스에서 해당 orderId에 대한 예약 정보를 조회합니다.
+            // 만료 인덱스에는 orderId:productId:quantity 형식으로 저장되어 있습니다.
+            val items = stockService.getReservedItems(orderId)
 
-            // TODO: 주문 상품 정보 조회 로직 추가 필요
-            // 임시로 빈 리스트 사용 (실제로는 주문 정보에서 가져와야 함)
-            val items = emptyList<StockReservationService.OrderItem>()
+            if (items.isEmpty()) {
+                logger.warn { "⚠️  No reserved items found for orderId: $orderId. Skipping stock confirmation." }
+                // 예약 정보가 없으면 이미 처리되었거나 만료된 것으로 간주
+                processedEventRepository.save(
+                    ProcessedEvent(
+                        eventId = eventId,
+                        eventType = "payment.completed",
+                    ),
+                )
+                acknowledgment.acknowledge()
+                return
+            }
+
+            logger.info { "📦 Found ${items.size} reserved items for orderId: $orderId" }
 
             // 재고 확정 (Redis → DB)
             val success = stockService.confirmStock(orderId, items)
