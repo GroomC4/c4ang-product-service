@@ -1,7 +1,7 @@
 package com.groom.product.application.service
 
-import com.groom.platform.testcontainers.annotation.IntegrationTest
 import com.groom.product.adapter.outbound.ai.TestGeminiConfig
+import com.groom.product.common.IntegrationTestBase
 import com.groom.product.common.config.NoOpEventPublisherConfig
 import com.groom.product.common.config.TestAwsConfig
 import com.groom.product.domain.model.Product
@@ -15,56 +15,14 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.util.UUID
 
-@IntegrationTest
-@SpringBootTest(
-    properties = [
-        "spring.profiles.active=test",
-        "testcontainers.postgres.enabled=true",
-        "testcontainers.postgres.replica-enabled=true",
-        "testcontainers.postgres.schema-location=project:sql/schema.sql",
-        "testcontainers.redis.enabled=true",
-        "testcontainers.kafka.enabled=true",
-        "testcontainers.kafka.auto-create-topics=true",
-        "testcontainers.kafka.topics[0].name=product.registered",
-        "testcontainers.kafka.topics[0].partitions=3",
-        "testcontainers.kafka.topics[0].replication-factor=1",
-        "testcontainers.kafka.topics[1].name=product.deleted",
-        "testcontainers.kafka.topics[1].partitions=1",
-        "testcontainers.kafka.topics[1].replication-factor=1",
-        "testcontainers.kafka.topics[2].name=store.info.updated",
-        "testcontainers.kafka.topics[2].partitions=3",
-        "testcontainers.kafka.topics[2].replication-factor=1",
-        "testcontainers.kafka.topics[3].name=store.deleted",
-        "testcontainers.kafka.topics[3].partitions=1",
-        "testcontainers.kafka.topics[3].replication-factor=1",
-        "testcontainers.kafka.topics[4].name=order.created",
-        "testcontainers.kafka.topics[4].partitions=3",
-        "testcontainers.kafka.topics[4].replication-factor=1",
-        "testcontainers.kafka.topics[5].name=payment.completed",
-        "testcontainers.kafka.topics[5].partitions=3",
-        "testcontainers.kafka.topics[5].replication-factor=1",
-        "testcontainers.kafka.topics[6].name=stock.reserved",
-        "testcontainers.kafka.topics[6].partitions=3",
-        "testcontainers.kafka.topics[6].replication-factor=1",
-        "testcontainers.kafka.topics[7].name=stock.reservation.failed",
-        "testcontainers.kafka.topics[7].partitions=1",
-        "testcontainers.kafka.topics[7].replication-factor=1",
-        "testcontainers.kafka.topics[8].name=stock.confirmed",
-        "testcontainers.kafka.topics[8].partitions=3",
-        "testcontainers.kafka.topics[8].replication-factor=1",
-    ],
-)
-@ActiveProfiles("test")
 @Import(NoOpEventPublisherConfig::class, TestAwsConfig::class, TestGeminiConfig::class)
 @DisplayName("StockReservationService 통합 테스트")
-class StockReservationServiceIntegrationTest {
+class StockReservationServiceIntegrationTest : IntegrationTestBase() {
     @Autowired
     private lateinit var stockReservationService: StockReservationService
 
