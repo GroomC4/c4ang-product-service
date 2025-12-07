@@ -1,7 +1,13 @@
 package com.groom.product.common
 
+import com.github.tomakehurst.wiremock.WireMockServer
 import com.groom.platform.testcontainers.annotation.IntegrationTest
+import com.groom.product.common.config.WireMockInitializer
+import com.groom.product.common.config.WireMockStoreStubbing.setupDefaultStoreStubs
+import org.junit.jupiter.api.BeforeEach
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ContextConfiguration
 
 /**
  * 통합 테스트 베이스 클래스
@@ -26,6 +32,11 @@ import org.springframework.boot.test.context.SpringBootTest
  * - @IntegrationTest 어노테이션 중앙화
  * - PostgreSQL Primary/Replica, Redis, Kafka 자동 시작
  * - 동적 포트 주입 자동화
+ *
+ * **WireMock 사용:**
+ * - WireMockInitializer를 통해 WireMock 서버 자동 시작
+ * - Store Service API 호출을 WireMock으로 stub
+ * - wireMockServer를 통해 추가 stub 설정 가능
  */
 @IntegrationTest
 @SpringBootTest(
@@ -87,4 +98,14 @@ import org.springframework.boot.test.context.SpringBootTest
         "testcontainers.kafka.topics[8].replication-factor=1",
     ],
 )
-abstract class IntegrationTestBase
+@ContextConfiguration(initializers = [WireMockInitializer::class])
+abstract class IntegrationTestBase {
+    @Autowired
+    protected lateinit var wireMockServer: WireMockServer
+
+    @BeforeEach
+    fun setupWireMockStubs() {
+        wireMockServer.resetAll()
+        wireMockServer.setupDefaultStoreStubs()
+    }
+}

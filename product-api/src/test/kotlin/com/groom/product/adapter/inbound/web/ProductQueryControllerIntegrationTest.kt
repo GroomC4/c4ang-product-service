@@ -1,16 +1,14 @@
 package com.groom.product.adapter.inbound.web
 
-import com.groom.platform.testcontainers.annotation.IntegrationTest
 import com.groom.product.adapter.outbound.ai.TestGeminiConfig
+import com.groom.product.common.IntegrationTestBase
 import com.groom.product.common.config.NoOpEventPublisherConfig
 import com.groom.product.common.config.TestAwsConfig
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.jdbc.SqlGroup
 import org.springframework.test.web.servlet.MockMvc
@@ -20,65 +18,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.UUID
 
-@IntegrationTest
-@SpringBootTest(
-    properties = [
-        "spring.profiles.active=test",
-
-        // PostgreSQL
-        "testcontainers.postgres.enabled=true",
-        "testcontainers.postgres.replica-enabled=true",
-        "testcontainers.postgres.schema-location=project:sql/schema.sql",
-
-        // Redis
-        "testcontainers.redis.enabled=true",
-
-        // Kafka
-        "testcontainers.kafka.enabled=true",
-        "testcontainers.kafka.auto-create-topics=true",
-
-        // Kafka Topics - Product Service (Producer)
-        "testcontainers.kafka.topics[0].name=product.registered",
-        "testcontainers.kafka.topics[0].partitions=3",
-        "testcontainers.kafka.topics[0].replication-factor=1",
-
-        "testcontainers.kafka.topics[1].name=product.deleted",
-        "testcontainers.kafka.topics[1].partitions=1",
-        "testcontainers.kafka.topics[1].replication-factor=1",
-
-        // Kafka Topics - Store Service (Consumer)
-        "testcontainers.kafka.topics[2].name=store.info.updated",
-        "testcontainers.kafka.topics[2].partitions=3",
-        "testcontainers.kafka.topics[2].replication-factor=1",
-
-        "testcontainers.kafka.topics[3].name=store.deleted",
-        "testcontainers.kafka.topics[3].partitions=1",
-        "testcontainers.kafka.topics[3].replication-factor=1",
-
-        // Kafka Topics - Order/Payment Service (Consumer)
-        "testcontainers.kafka.topics[4].name=order.created",
-        "testcontainers.kafka.topics[4].partitions=3",
-        "testcontainers.kafka.topics[4].replication-factor=1",
-
-        "testcontainers.kafka.topics[5].name=payment.completed",
-        "testcontainers.kafka.topics[5].partitions=3",
-        "testcontainers.kafka.topics[5].replication-factor=1",
-
-        // Kafka Topics - Stock Events (Producer)
-        "testcontainers.kafka.topics[6].name=stock.reserved",
-        "testcontainers.kafka.topics[6].partitions=3",
-        "testcontainers.kafka.topics[6].replication-factor=1",
-
-        "testcontainers.kafka.topics[7].name=stock.reservation.failed",
-        "testcontainers.kafka.topics[7].partitions=1",
-        "testcontainers.kafka.topics[7].replication-factor=1",
-
-        "testcontainers.kafka.topics[8].name=stock.confirmed",
-        "testcontainers.kafka.topics[8].partitions=3",
-        "testcontainers.kafka.topics[8].replication-factor=1",
-    ],
-)
-@ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @Import(NoOpEventPublisherConfig::class, TestAwsConfig::class, TestGeminiConfig::class)
 @SqlGroup(
@@ -96,7 +35,7 @@ import java.util.UUID
     ),
 )
 @DisplayName("상품 조회(Query) 컨트롤러 통합 테스트")
-class ProductQueryControllerIntegrationTest {
+class ProductQueryControllerIntegrationTest : IntegrationTestBase() {
     @Autowired
     private lateinit var mockMvc: MockMvc
 

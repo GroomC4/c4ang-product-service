@@ -3,6 +3,7 @@ package com.groom.product.application.service
 import com.groom.product.adapter.outbound.storage.S3ImageUploader
 import com.groom.product.domain.service.ImageUploadPolicy
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
@@ -16,6 +17,7 @@ private val logger = KotlinLogging.logger {}
  * - 인프라 업로드 실행 (S3ImageUploader)
  */
 @Service
+@ConditionalOnProperty(prefix = "aws.s3", name = ["enabled"], havingValue = "true", matchIfMissing = false)
 class UploadProductImageService(
     private val s3ImageUploader: S3ImageUploader,
 ) {

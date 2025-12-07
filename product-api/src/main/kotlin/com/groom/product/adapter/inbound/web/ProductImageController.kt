@@ -3,6 +3,7 @@ package com.groom.product.adapter.inbound.web
 import com.groom.product.adapter.inbound.web.dto.UploadImageResponse
 import com.groom.product.application.service.UploadProductImageService
 import io.swagger.v3.oas.annotations.Operation
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile
 @Tag(name = "Product Image", description = "상품 이미지 API")
 @RestController
 @RequestMapping("/api/v1/products/images")
+@ConditionalOnProperty(prefix = "aws.s3", name = ["enabled"], havingValue = "true", matchIfMissing = false)
 class ProductImageController(
     private val uploadProductImageService: UploadProductImageService,
 ) {

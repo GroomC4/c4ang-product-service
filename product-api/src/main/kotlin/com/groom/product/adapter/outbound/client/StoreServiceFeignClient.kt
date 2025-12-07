@@ -2,7 +2,6 @@ package com.groom.product.adapter.outbound.client
 
 import com.groom.product.adapter.outbound.client.dto.StoreInternalDto
 import org.springframework.cloud.openfeign.FeignClient
-import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import java.util.UUID
@@ -13,13 +12,12 @@ import java.util.UUID
  * Store Service의 Internal API와 통신합니다.
  * Internal API는 서비스 간 통신을 위해 설계된 API입니다.
  *
- * 테스트 환경에서는 MockStoreServiceClient가 사용됩니다.
+ * 테스트 환경에서는 WireMock을 통해 stub 응답을 받습니다.
  */
 @FeignClient(
     name = "store-service",
     url = "\${feign.clients.store-service.url:http://localhost:8082}",
 )
-@Profile("!test")
 interface StoreServiceFeignClient : StoreServiceClient {
     /**
      * 특정 스토어 정보 조회
