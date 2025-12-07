@@ -83,7 +83,9 @@ dependencies {
     testImplementation("io.github.openfeign:feign-jackson:13.1")
 
     // WireMock for integration tests (Feign Client stubbing)
-    testImplementation("org.wiremock:wiremock-standalone:3.3.1")
+    // Note: Spring Cloud Contract 4.1.x requires WireMock 2.x (wiremock-jre8-standalone)
+    // Using 3.x causes NoSuchMethodError with ResponseTemplateTransformer
+    testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.1")
 }
 
 // 모든 Test 태스크에 공통 설정 적용
@@ -188,11 +190,11 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
 contracts {
     testMode.set(org.springframework.cloud.contract.verifier.config.TestMode.MOCKMVC)
     baseClassForTests.set("com.groom.product.common.ContractTestBase")
-    // Service API와 Internal API 모두 포함
-    contractsDslDir.set(file("src/test/resources"))
-    // contracts.service-api와 contracts.internal 디렉토리 모두 사용
+    // contracts.internal 디렉토리만 포함 (application-*.yml 파일 제외를 위해)
+    contractsDslDir.set(file("src/test/resources/contracts.internal"))
+    // contracts.internal 하위 디렉토리 사용
     baseClassMappings.apply {
-        baseClassMapping(".*contracts\\.internal.*", "com.groom.product.common.ContractTestBase")
+        baseClassMapping(".*order-service.*", "com.groom.product.common.ContractTestBase")
     }
 }
 
