@@ -2,6 +2,7 @@ package com.groom.product.adapter.outbound.storage
 
 import com.groom.product.configuration.properties.S3Properties
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.core.sync.RequestBody
@@ -18,6 +19,7 @@ private val logger = KotlinLogging.logger {}
  * AWS S3에 이미지를 업로드하는 구현체입니다.
  */
 @Component
+@ConditionalOnProperty(prefix = "aws.s3", name = ["enabled"], havingValue = "true", matchIfMissing = false)
 open class S3ImageUploader(
     private val s3Client: S3Client,
     private val s3Properties: S3Properties,

@@ -91,9 +91,12 @@ kafka:
     product-registered: product.registered
     product-deleted: product.deleted
 
-# AWS S3 설정 (k3d)
+# AWS S3 설정 (k3d - 비활성화)
+# k3d 환경에서는 AWS 자격증명이 없으므로 S3 기능을 비활성화합니다.
+# 프로덕션에서 활성화하려면 enabled: true로 설정하세요.
 aws:
   s3:
+    enabled: ${AWS_S3_ENABLED:false}
     bucket-name: ${AWS_S3_BUCKET:c4ang-product-images-dev}
     region: ${AWS_REGION:ap-northeast-2}
 
