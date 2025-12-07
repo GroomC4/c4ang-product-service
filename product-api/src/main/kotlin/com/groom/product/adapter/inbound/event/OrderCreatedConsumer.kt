@@ -69,7 +69,7 @@ class OrderCreatedConsumer(
                 }
 
             // 재고 예약 시도
-            when (val result = stockService.reserveStock(orderId, items)) {
+            when (val result = stockService.reserveStock(orderId, items, orderNumber = orderId.toString())) {
                 is StockReservationService.ReservationResult.Success -> {
                     logger.info { "✅ Stock reservation successful for orderId: $orderId" }
 

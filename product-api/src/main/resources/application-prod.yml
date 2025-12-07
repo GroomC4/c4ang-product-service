@@ -35,6 +35,8 @@ spring:
 platform:
   datasource:
     replica-enabled: true
+  saga:
+    enabled: true
   jpa:
     hibernate:
       ddl-auto: none
