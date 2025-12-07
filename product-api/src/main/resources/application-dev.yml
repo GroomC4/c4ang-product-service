@@ -62,6 +62,11 @@ spring.data.redis:
   host: ${REDIS_HOST:cache-redis}
   port: ${REDIS_PORT:6379}
 
+# Platform Core Saga Tracker 설정
+platform:
+  saga:
+    enabled: true
+
 # Security 설정
 security:
   jwt:

@@ -1,5 +1,8 @@
 package com.groom.product.application.service
 
+import com.groom.platform.saga.SagaSteps
+import com.groom.platform.saga.SagaTrackerClient
+import com.groom.platform.saga.SagaType
 import com.groom.product.domain.port.LoadProductPort
 import com.groom.product.domain.port.SaveProductPort
 import com.groom.product.domain.port.StockReservationPort
@@ -24,6 +27,7 @@ class StockReservationService(
     private val stockReservationPort: StockReservationPort,
     private val loadProductPort: LoadProductPort,
     private val saveProductPort: SaveProductPort,
+    private val sagaTrackerClient: SagaTrackerClient,
 ) {
     /**
      * 주문 상품들의 재고를 예약합니다.
@@ -38,8 +42,20 @@ class StockReservationService(
         orderId: UUID,
         items: List<OrderItem>,
         ttlMinutes: Long = 15,
+        orderNumber: String? = null,
     ): ReservationResult {
         logger.info { "📦 Attempting to reserve stock for orderId: $orderId, items: $items" }
+
+        // Saga Tracker: 재고 예약 시작
+        orderNumber?.let {
+            sagaTrackerClient.recordProgress(
+                sagaId = orderId.toString(),
+                sagaType = SagaType.ORDER_CREATION,
+                step = SagaSteps.STOCK_RESERVATION,
+                orderId = it,
+                metadata = mapOf("itemCount" to items.size, "ttlMinutes" to ttlMinutes),
+            )
+        }
 
         // 1. DB에서 상품 재고 확인
         val productIds = items.map { it.productId }
@@ -124,10 +140,42 @@ class StockReservationService(
 
         // 3. 실패 시 전체 롤백
         if (failedItems.isNotEmpty()) {
-            rollbackReservation(orderId, reservedItems)
+            rollbackReservation(orderId, reservedItems, orderNumber)
+
+            // Saga Tracker: 재고 예약 실패
+            orderNumber?.let {
+                sagaTrackerClient.recordProgress(
+                    sagaId = orderId.toString(),
+                    sagaType = SagaType.ORDER_CREATION,
+                    step = SagaSteps.STOCK_RESERVATION_FAILED,
+                    orderId = it,
+                    metadata =
+                        mapOf(
+                            "reason" to "재고 부족",
+                            "failedItemCount" to failedItems.size,
+                            "failedProducts" to failedItems.map { it.productId.toString() },
+                        ),
+                )
+            }
+
             return ReservationResult.Failure(
                 failedItems = failedItems,
                 reason = "재고 부족",
+            )
+        }
+
+        // Saga Tracker: 재고 예약 성공
+        orderNumber?.let {
+            sagaTrackerClient.recordProgress(
+                sagaId = orderId.toString(),
+                sagaType = SagaType.ORDER_CREATION,
+                step = SagaSteps.STOCK_RESERVED,
+                orderId = it,
+                metadata =
+                    mapOf(
+                        "reservedItemCount" to reservedItems.size,
+                        "reservedProducts" to reservedItems.map { it.productId.toString() },
+                    ),
             )
         }
 
@@ -186,12 +234,28 @@ class StockReservationService(
     private fun rollbackReservation(
         orderId: UUID,
         reservedItems: List<ReservedItem>,
+        orderNumber: String? = null,
     ) {
         logger.warn { "🔄 Rolling back stock reservation for orderId: $orderId" }
 
         for (item in reservedItems) {
             stockReservationPort.incrementStock(item.productId, item.quantity)
             stockReservationPort.deleteReservation(orderId, item.productId)
+        }
+
+        // Saga Tracker: 재고 보상 (롤백)
+        if (reservedItems.isNotEmpty() && orderNumber != null) {
+            sagaTrackerClient.recordProgress(
+                sagaId = orderId.toString(),
+                sagaType = SagaType.ORDER_CREATION,
+                step = SagaSteps.STOCK_RELEASED,
+                orderId = orderNumber,
+                metadata =
+                    mapOf(
+                        "releasedItemCount" to reservedItems.size,
+                        "releasedProducts" to reservedItems.map { it.productId.toString() },
+                    ),
+            )
         }
     }
 

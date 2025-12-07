@@ -1,5 +1,6 @@
 package com.groom.product.application.service
 
+import com.groom.platform.saga.SagaTrackerClient
 import com.groom.product.common.annotation.UnitTest
 import com.groom.product.domain.model.Product
 import com.groom.product.domain.port.LoadProductPort
@@ -43,7 +44,8 @@ class StockReservationServiceTest :
                 val stockReservationPort = mockk<StockReservationPort>(relaxed = true)
                 val loadProductPort = mockk<LoadProductPort>(relaxed = true)
                 val saveProductPort = mockk<SaveProductPort>(relaxed = true)
-                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort)
+                val sagaTrackerClient = mockk<SagaTrackerClient>(relaxed = true)
+                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort, sagaTrackerClient)
 
                 val testOrderId = UUID.randomUUID()
                 val testProductId = UUID.randomUUID()
@@ -75,7 +77,8 @@ class StockReservationServiceTest :
                 val stockReservationPort = mockk<StockReservationPort>(relaxed = true)
                 val loadProductPort = mockk<LoadProductPort>(relaxed = true)
                 val saveProductPort = mockk<SaveProductPort>(relaxed = true)
-                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort)
+                val sagaTrackerClient = mockk<SagaTrackerClient>(relaxed = true)
+                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort, sagaTrackerClient)
 
                 val testOrderId = UUID.randomUUID()
                 val testProductId = UUID.randomUUID()
@@ -106,7 +109,8 @@ class StockReservationServiceTest :
                 val stockReservationPort = mockk<StockReservationPort>(relaxed = true)
                 val loadProductPort = mockk<LoadProductPort>(relaxed = true)
                 val saveProductPort = mockk<SaveProductPort>(relaxed = true)
-                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort)
+                val sagaTrackerClient = mockk<SagaTrackerClient>(relaxed = true)
+                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort, sagaTrackerClient)
 
                 val testOrderId = UUID.randomUUID()
                 val testProductId = UUID.randomUUID()
@@ -130,7 +134,8 @@ class StockReservationServiceTest :
                 val stockReservationPort = mockk<StockReservationPort>(relaxed = true)
                 val loadProductPort = mockk<LoadProductPort>(relaxed = true)
                 val saveProductPort = mockk<SaveProductPort>(relaxed = true)
-                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort)
+                val sagaTrackerClient = mockk<SagaTrackerClient>(relaxed = true)
+                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort, sagaTrackerClient)
 
                 val testOrderId = UUID.randomUUID()
                 val testProductId1 = UUID.randomUUID()
@@ -178,7 +183,8 @@ class StockReservationServiceTest :
                 val stockReservationPort = mockk<StockReservationPort>(relaxed = true)
                 val loadProductPort = mockk<LoadProductPort>(relaxed = true)
                 val saveProductPort = mockk<SaveProductPort>(relaxed = true)
-                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort)
+                val sagaTrackerClient = mockk<SagaTrackerClient>(relaxed = true)
+                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort, sagaTrackerClient)
 
                 val testOrderId = UUID.randomUUID()
                 val testProductId = UUID.randomUUID()
@@ -202,7 +208,8 @@ class StockReservationServiceTest :
                 val stockReservationPort = mockk<StockReservationPort>(relaxed = true)
                 val loadProductPort = mockk<LoadProductPort>(relaxed = true)
                 val saveProductPort = mockk<SaveProductPort>(relaxed = true)
-                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort)
+                val sagaTrackerClient = mockk<SagaTrackerClient>(relaxed = true)
+                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort, sagaTrackerClient)
 
                 val testOrderId = UUID.randomUUID()
                 val testProductId = UUID.randomUUID()
@@ -220,7 +227,8 @@ class StockReservationServiceTest :
                 val stockReservationPort = mockk<StockReservationPort>(relaxed = true)
                 val loadProductPort = mockk<LoadProductPort>(relaxed = true)
                 val saveProductPort = mockk<SaveProductPort>(relaxed = true)
-                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort)
+                val sagaTrackerClient = mockk<SagaTrackerClient>(relaxed = true)
+                val stockService = StockReservationService(stockReservationPort, loadProductPort, saveProductPort, sagaTrackerClient)
 
                 val testOrderId = UUID.randomUUID()
                 val testProductId = UUID.randomUUID()
