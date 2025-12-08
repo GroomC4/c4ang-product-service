@@ -1,9 +1,10 @@
 package com.groom.product.adapter.inbound.internal.dto.rag
 
+import com.groom.product.domain.model.Perfume
 import java.math.BigDecimal
 
 /**
- * RAG 서비스용 향수 검색 결과 응답 DTO.
+ * RAG 서비스용 향수 검색 결과 응답 DTO (v2).
  *
  * @property results 검색 결과 목록
  * @property totalCount 전체 결과 수
@@ -11,10 +12,18 @@ import java.math.BigDecimal
 data class RagProductSearchResponse(
     val results: List<RagProductSummary>,
     val totalCount: Int,
-)
+) {
+    companion object {
+        fun from(perfumes: List<Perfume>): RagProductSearchResponse =
+            RagProductSearchResponse(
+                results = perfumes.map { RagProductSummary.from(it) },
+                totalCount = perfumes.size,
+            )
+    }
+}
 
 /**
- * RAG 서비스용 향수 요약 정보 DTO.
+ * RAG 서비스용 향수 요약 정보 DTO (v2).
  *
  * @property id 향수 고유 ID
  * @property brand 브랜드명
@@ -22,16 +31,69 @@ data class RagProductSearchResponse(
  * @property concentration 농도 (Parfum/EDP/EDT/EDC)
  * @property mainAccords 주요 향조
  * @property description 설명
- * @property price 가격
- * @property similarityScore 유사도 점수 (0~1)
+ * @property gender 성별 타겟
+ * @property imageUrl 이미지 URL
+ * @property sizes 용량별 가격 정보
  */
 data class RagProductSummary(
     val id: String,
     val brand: String,
     val name: String,
     val concentration: String? = null,
-    val mainAccords: String? = null,
+    val mainAccords: List<String>? = null,
     val description: String? = null,
-    val price: BigDecimal? = null,
-    val similarityScore: Double? = null,
+    val gender: String? = null,
+    val imageUrl: String? = null,
+    val sizes: List<PerfumeSize>? = null,
+) {
+    companion object {
+        fun from(perfume: Perfume): RagProductSummary =
+            RagProductSummary(
+                id = perfume.id.toString(),
+                brand = perfume.brand,
+                name = perfume.name,
+                concentration = perfume.concentration,
+                mainAccords = perfume.mainAccords?.parseJsonArray(),
+                description = null,
+                gender = perfume.gender,
+                imageUrl = null,
+                sizes = perfume.sizes?.parseSizes(),
+            )
+    }
+}
+
+/**
+ * 향수 용량 및 가격 정보 DTO.
+ *
+ * @property sizeMl 용량 (ml)
+ * @property price 가격
+ */
+data class PerfumeSize(
+    val sizeMl: Int,
+    val price: BigDecimal,
 )
+
+/**
+ * JSON 문자열을 List<String>으로 파싱합니다.
+ */
+internal fun String.parseJsonArray(): List<String>? =
+    try {
+        com.fasterxml.jackson.module.kotlin
+            .jacksonObjectMapper()
+            .readValue(this, Array<String>::class.java)
+            .toList()
+    } catch (e: Exception) {
+        null
+    }
+
+/**
+ * sizes JSON 문자열을 List<PerfumeSize>로 파싱합니다.
+ */
+internal fun String.parseSizes(): List<PerfumeSize>? =
+    try {
+        val mapper = com.fasterxml.jackson.module.kotlin.jacksonObjectMapper()
+        val typeRef = mapper.typeFactory.constructCollectionType(List::class.java, PerfumeSize::class.java)
+        mapper.readValue(this, typeRef)
+    } catch (e: Exception) {
+        null
+    }

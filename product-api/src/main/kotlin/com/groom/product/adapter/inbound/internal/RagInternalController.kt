@@ -6,8 +6,7 @@ import com.groom.product.adapter.inbound.internal.dto.rag.RagCompareProductsResp
 import com.groom.product.adapter.inbound.internal.dto.rag.RagProductDetailResponse
 import com.groom.product.adapter.inbound.internal.dto.rag.RagProductSearchRequest
 import com.groom.product.adapter.inbound.internal.dto.rag.RagProductSearchResponse
-import com.groom.product.adapter.inbound.internal.dto.rag.RagSimilarProductsRequest
-import com.groom.product.adapter.inbound.internal.dto.rag.RagSimilarProductsResponse
+import com.groom.product.application.service.RagPerfumeService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -24,30 +23,39 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 /**
- * RAG(챗봇) 서비스용 Internal API Controller.
+ * RAG(챗봇) 서비스용 Internal API Controller (v2).
  *
- * 챗봇이 향수 검색, 추천, 비교 등의 기능을 수행할 때 사용하는 Internal API입니다.
+ * 챗봇이 향수 검색, 상세조회, 비교 등의 기능을 수행할 때 사용하는 Internal API입니다.
  * Consumer-Driven Contract 패턴에 따라 RAG 서비스가 필요로 하는 필드를 반환합니다.
  *
+ * v2 변경사항:
+ * - 용량 정보는 향수 상세정보에 포함 (sizes 배열)
+ * - top_k, similarity_score 등 유사도 관련 파라미터 제거 (RAG에서 벡터DB로 처리)
+ * - Product 서비스는 조건에 맞는 제품 정보만 제공
+ * - 유사 향수 검색 API는 검색 API의 product_ids 파라미터로 통합
+ *
  * Endpoints:
- * - POST /internal/v1/rag/products/search - 향수 검색/추천
+ * - POST /internal/v1/rag/products/search - 향수 검색
  * - GET /internal/v1/rag/products/{id} - 향수 상세 조회
- * - POST /internal/v1/rag/products/similar - 유사 향수 검색
  * - POST /internal/v1/rag/products/compare - 향수 비교
  */
 @Tag(name = "RAG Internal API", description = "Internal API for RAG (chatbot) service")
 @RestController
 @RequestMapping("/internal/v1/rag/products")
-class RagInternalController {
+class RagInternalController(
+    private val ragPerfumeService: RagPerfumeService,
+) {
     /**
-     * 향수 검색/추천
+     * 향수 검색.
      *
-     * 자연어 쿼리와 필터를 기반으로 향수를 검색합니다.
+     * 조건에 맞는 향수 목록을 검색합니다.
+     * product_ids가 제공되면 다른 필터는 무시하고 해당 ID의 향수만 반환합니다.
+     * RAG에서 벡터DB로 유사 향수 ID를 찾은 후, 이 API로 상세 정보를 조회합니다.
      *
      * @param request 검색 요청 DTO
      * @return 검색 결과 목록
      */
-    @Operation(summary = "향수 검색/추천", description = "자연어 쿼리와 필터를 기반으로 향수를 검색합니다.")
+    @Operation(summary = "향수 검색", description = "조건에 맞는 향수 목록을 검색합니다. product_ids가 제공되면 다른 필터는 무시됩니다.")
     @ApiResponses(
         value = [
             ApiResponse(
@@ -61,20 +69,25 @@ class RagInternalController {
     fun searchProducts(
         @RequestBody request: RagProductSearchRequest,
     ): RagProductSearchResponse {
-        // TODO: 실제 구현 필요
-        throw UnsupportedOperationException("Not implemented yet")
+        val perfumes =
+            ragPerfumeService.searchPerfumes(
+                productIds = request.productIds,
+                brand = request.brand,
+                gender = request.gender,
+            )
+        return RagProductSearchResponse.from(perfumes)
     }
 
     /**
-     * 향수 상세 조회
+     * 향수 상세 조회.
      *
-     * 특정 향수의 상세 정보(노트, 설명 등)를 조회합니다.
+     * 특정 향수의 상세 정보(노트, 설명, 용량별 가격 등)를 조회합니다.
      *
      * @param id 향수 고유 ID
      * @return 향수 상세 정보
      * @throws com.groom.product.common.exception.ProductException.ProductNotFound 향수를 찾을 수 없는 경우
      */
-    @Operation(summary = "향수 상세 조회", description = "특정 향수의 상세 정보(노트, 설명 등)를 조회합니다.")
+    @Operation(summary = "향수 상세 조회", description = "특정 향수의 상세 정보(노트, 설명, 용량별 가격 등)를 조회합니다.")
     @ApiResponses(
         value = [
             ApiResponse(
@@ -93,44 +106,12 @@ class RagInternalController {
     fun getProductDetail(
         @PathVariable id: UUID,
     ): RagProductDetailResponse {
-        // TODO: 실제 구현 필요
-        throw UnsupportedOperationException("Not implemented yet")
+        val perfume = ragPerfumeService.getPerfumeDetail(id)
+        return RagProductDetailResponse.from(perfume)
     }
 
     /**
-     * 유사 향수 검색
-     *
-     * 특정 향수와 비슷한 향수를 찾습니다. (KNN 유사도 탐색)
-     *
-     * @param request 유사 향수 검색 요청 DTO
-     * @return 유사 향수 목록
-     * @throws com.groom.product.common.exception.ProductException.ProductNotFound 기준 향수를 찾을 수 없는 경우
-     */
-    @Operation(summary = "유사 향수 검색", description = "특정 향수와 비슷한 향수를 찾습니다.")
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "200",
-                description = "검색 성공",
-                content = [Content(schema = Schema(implementation = RagSimilarProductsResponse::class))],
-            ),
-            ApiResponse(
-                responseCode = "404",
-                description = "기준 향수를 찾을 수 없음",
-                content = [Content(schema = Schema(implementation = ProductNotFoundErrorResponse::class))],
-            ),
-        ],
-    )
-    @PostMapping("/similar", produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun findSimilarProducts(
-        @RequestBody request: RagSimilarProductsRequest,
-    ): RagSimilarProductsResponse {
-        // TODO: 실제 구현 필요
-        throw UnsupportedOperationException("Not implemented yet")
-    }
-
-    /**
-     * 향수 비교
+     * 향수 비교.
      *
      * 2~4개의 향수를 비교 분석합니다.
      *
@@ -151,7 +132,7 @@ class RagInternalController {
     fun compareProducts(
         @RequestBody request: RagCompareProductsRequest,
     ): RagCompareProductsResponse {
-        // TODO: 실제 구현 필요
-        throw UnsupportedOperationException("Not implemented yet")
+        val perfumes = ragPerfumeService.comparePerfumes(request.productIds)
+        return RagCompareProductsResponse.from(perfumes)
     }
 }

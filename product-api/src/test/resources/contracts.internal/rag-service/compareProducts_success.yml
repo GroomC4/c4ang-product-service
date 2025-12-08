@@ -1,7 +1,10 @@
 name: rag_service_compare_products_success
 description: |
   Consumer: rag-service
-  Purpose: 챗봇이 2~4개의 향수를 비교할 때 사용
+  Purpose: 챗봇이 2~4개의 향수를 비교할 때 사용 (v2)
+  v2 변경사항:
+  - sizes 배열 추가 (용량별 가격)
+  - 노트들은 배열 타입
 
 request:
   method: POST
@@ -24,20 +27,40 @@ response:
         brand: "디올"
         name: "미스 디올"
         concentration: "EDP"
-        mainAccords: "플로랄, 로즈"
-        topNotes: "만다린"
-        middleNotes: "로즈"
-        baseNotes: "머스크"
-        price: 180000.00
+        mainAccords:
+          - "플로랄"
+          - "로즈"
+        topNotes:
+          - "만다린"
+        middleNotes:
+          - "로즈"
+        baseNotes:
+          - "머스크"
+        gender: "Female"
+        sizes:
+          - sizeMl: 30
+            price: 120000.00
+          - sizeMl: 50
+            price: 180000.00
       - id: "550e8400-e29b-41d4-a716-446655440001"
         brand: "샤넬"
         name: "코코 마드모아젤"
         concentration: "EDP"
-        mainAccords: "플로랄, 시트러스"
-        topNotes: "오렌지"
-        middleNotes: "재스민"
-        baseNotes: "바닐라"
-        price: 220000.00
+        mainAccords:
+          - "플로랄"
+          - "시트러스"
+        topNotes:
+          - "오렌지"
+        middleNotes:
+          - "재스민"
+        baseNotes:
+          - "바닐라"
+        gender: "Female"
+        sizes:
+          - sizeMl: 50
+            price: 200000.00
+          - sizeMl: 100
+            price: 320000.00
   matchers:
     body:
       - path: $.comparisonCount
