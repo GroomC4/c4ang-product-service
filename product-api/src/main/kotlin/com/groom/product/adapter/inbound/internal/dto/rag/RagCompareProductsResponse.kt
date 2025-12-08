@@ -1,5 +1,6 @@
 package com.groom.product.adapter.inbound.internal.dto.rag
 
+import com.groom.product.common.util.NoteTranslator
 import com.groom.product.domain.model.Perfume
 
 /**
@@ -13,10 +14,13 @@ data class RagCompareProductsResponse(
     val products: List<RagCompareProduct>,
 ) {
     companion object {
-        fun from(perfumes: List<Perfume>): RagCompareProductsResponse =
+        fun from(
+            perfumes: List<Perfume>,
+            translateToKorean: Boolean = true,
+        ): RagCompareProductsResponse =
             RagCompareProductsResponse(
                 comparisonCount = perfumes.size,
-                products = perfumes.map { RagCompareProduct.from(it) },
+                products = perfumes.map { RagCompareProduct.from(it, translateToKorean) },
             )
     }
 }
@@ -48,18 +52,30 @@ data class RagCompareProduct(
     val sizes: List<PerfumeSize>? = null,
 ) {
     companion object {
-        fun from(perfume: Perfume): RagCompareProduct =
-            RagCompareProduct(
+        fun from(
+            perfume: Perfume,
+            translateToKorean: Boolean = true,
+        ): RagCompareProduct {
+            val mainAccords = perfume.mainAccords?.parseJsonArray()
+            val topNotes = perfume.topNotes?.parseJsonArray()
+            val middleNotes = perfume.middleNotes?.parseJsonArray()
+            val baseNotes = perfume.baseNotes?.parseJsonArray()
+
+            return RagCompareProduct(
                 id = perfume.id.toString(),
                 brand = perfume.brand,
                 name = perfume.name,
                 concentration = perfume.concentration,
-                mainAccords = perfume.mainAccords?.parseJsonArray(),
-                topNotes = perfume.topNotes?.parseJsonArray(),
-                middleNotes = perfume.middleNotes?.parseJsonArray(),
-                baseNotes = perfume.baseNotes?.parseJsonArray(),
+                mainAccords = mainAccords?.translateIfNeeded(translateToKorean),
+                topNotes = topNotes?.translateIfNeeded(translateToKorean),
+                middleNotes = middleNotes?.translateIfNeeded(translateToKorean),
+                baseNotes = baseNotes?.translateIfNeeded(translateToKorean),
                 gender = perfume.gender,
                 sizes = perfume.sizes?.parseSizes(),
             )
+        }
+
+        private fun List<String>.translateIfNeeded(translateToKorean: Boolean): List<String> =
+            if (translateToKorean) NoteTranslator.toKoreanList(this) else this
     }
 }

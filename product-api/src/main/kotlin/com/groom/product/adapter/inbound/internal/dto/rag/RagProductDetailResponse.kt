@@ -1,5 +1,6 @@
 package com.groom.product.adapter.inbound.internal.dto.rag
 
+import com.groom.product.common.util.NoteTranslator
 import com.groom.product.domain.model.Perfume
 
 /**
@@ -39,16 +40,24 @@ data class RagProductDetailResponse(
     val detailUrl: String? = null,
 ) {
     companion object {
-        fun from(perfume: Perfume): RagProductDetailResponse =
-            RagProductDetailResponse(
+        fun from(
+            perfume: Perfume,
+            translateToKorean: Boolean = true,
+        ): RagProductDetailResponse {
+            val mainAccords = perfume.mainAccords?.parseJsonArray()
+            val topNotes = perfume.topNotes?.parseJsonArray()
+            val middleNotes = perfume.middleNotes?.parseJsonArray()
+            val baseNotes = perfume.baseNotes?.parseJsonArray()
+
+            return RagProductDetailResponse(
                 id = perfume.id.toString(),
                 brand = perfume.brand,
                 name = perfume.name,
                 concentration = perfume.concentration,
-                mainAccords = perfume.mainAccords?.parseJsonArray(),
-                topNotes = perfume.topNotes?.parseJsonArray(),
-                middleNotes = perfume.middleNotes?.parseJsonArray(),
-                baseNotes = perfume.baseNotes?.parseJsonArray(),
+                mainAccords = mainAccords?.translateIfNeeded(translateToKorean),
+                topNotes = topNotes?.translateIfNeeded(translateToKorean),
+                middleNotes = middleNotes?.translateIfNeeded(translateToKorean),
+                baseNotes = baseNotes?.translateIfNeeded(translateToKorean),
                 description = null,
                 gender = perfume.gender,
                 seasonScore = perfume.seasonScore?.parseSeasonScore(),
@@ -57,6 +66,10 @@ data class RagProductDetailResponse(
                 imageUrl = null,
                 detailUrl = perfume.detailUrl,
             )
+        }
+
+        private fun List<String>.translateIfNeeded(translateToKorean: Boolean): List<String> =
+            if (translateToKorean) NoteTranslator.toKoreanList(this) else this
     }
 }
 

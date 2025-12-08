@@ -1,5 +1,6 @@
 package com.groom.product.adapter.inbound.internal.dto.rag
 
+import com.groom.product.common.util.NoteTranslator
 import com.groom.product.domain.model.Perfume
 import java.math.BigDecimal
 
@@ -14,9 +15,12 @@ data class RagProductSearchResponse(
     val totalCount: Int,
 ) {
     companion object {
-        fun from(perfumes: List<Perfume>): RagProductSearchResponse =
+        fun from(
+            perfumes: List<Perfume>,
+            translateToKorean: Boolean = true,
+        ): RagProductSearchResponse =
             RagProductSearchResponse(
-                results = perfumes.map { RagProductSummary.from(it) },
+                results = perfumes.map { RagProductSummary.from(it, translateToKorean) },
                 totalCount = perfumes.size,
             )
     }
@@ -47,18 +51,29 @@ data class RagProductSummary(
     val sizes: List<PerfumeSize>? = null,
 ) {
     companion object {
-        fun from(perfume: Perfume): RagProductSummary =
-            RagProductSummary(
+        fun from(
+            perfume: Perfume,
+            translateToKorean: Boolean = true,
+        ): RagProductSummary {
+            val mainAccords = perfume.mainAccords?.parseJsonArray()
+
+            return RagProductSummary(
                 id = perfume.id.toString(),
                 brand = perfume.brand,
                 name = perfume.name,
                 concentration = perfume.concentration,
-                mainAccords = perfume.mainAccords?.parseJsonArray(),
+                mainAccords =
+                    if (translateToKorean) {
+                        mainAccords?.let { NoteTranslator.toKoreanList(it) }
+                    } else {
+                        mainAccords
+                    },
                 description = null,
                 gender = perfume.gender,
                 imageUrl = null,
                 sizes = perfume.sizes?.parseSizes(),
             )
+        }
     }
 }
 
