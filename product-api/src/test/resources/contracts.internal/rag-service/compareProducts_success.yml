@@ -1,0 +1,90 @@
+name: rag_service_compare_products_success
+description: |
+  Consumer: rag-service
+  Purpose: 챗봇이 2~4개의 향수를 비교할 때 사용 (v2)
+  v2 변경사항:
+  - sizes 배열 추가 (용량별 가격)
+  - 노트들은 배열 타입
+
+request:
+  method: POST
+  url: /internal/v1/rag/perfumes/compare
+  headers:
+    Content-Type: application/json
+  body:
+    productIds:
+      - "550e8400-e29b-41d4-a716-446655440000"
+      - "550e8400-e29b-41d4-a716-446655440001"
+
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    comparisonCount: 2
+    products:
+      - id: "550e8400-e29b-41d4-a716-446655440000"
+        brand: "조말론"
+        name: "라임 바질 앤 만다린_CONTRACT"
+        concentration: "Eau de Cologne"
+        mainAccords:
+          - "시트러스"
+          - "아로마틱"
+        topNotes:
+          - "라임"
+          - "만다린 오렌지"
+          - "베르가못"
+        middleNotes:
+          - "바질"
+          - "타임"
+        baseNotes:
+          - "베티버"
+          - "앰버그리스"
+        gender: "Unisex"
+        sizes:
+          - sizeMl: 30
+            price: 95000.00
+          - sizeMl: 100
+            price: 195000.00
+      - id: "550e8400-e29b-41d4-a716-446655440001"
+        brand: "아쿠아 디 파르마"
+        name: "콜로니아_CONTRACT"
+        concentration: "Eau de Cologne"
+        mainAccords:
+          - "시트러스"
+          - "우디"
+        topNotes:
+          - "레몬"
+          - "베르가못"
+          - "오렌지"
+        middleNotes:
+          - "라벤더"
+          - "로즈마리"
+        baseNotes:
+          - "베티버"
+          - "샌달우드"
+          - "파촐리"
+        gender: "Unisex"
+        sizes:
+          - sizeMl: 50
+            price: 120000.00
+          - sizeMl: 100
+            price: 180000.00
+  matchers:
+    body:
+      - path: $.comparisonCount
+        type: by_type
+      - path: $.products[0].id
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.products[0].brand
+        type: by_type
+      - path: $.products[0].name
+        type: by_type
+      - path: $.products[1].id
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.products[1].brand
+        type: by_type
+      - path: $.products[1].name
+        type: by_type

@@ -1,0 +1,61 @@
+name: rag_service_search_products_by_ids
+description: |
+  Consumer: rag-service
+  Purpose: RAG에서 벡터DB로 찾은 유사 향수 ID들로 상세 정보를 조회할 때 사용 (v2)
+  v2 변경사항:
+  - product_ids가 제공되면 다른 필터 무시
+  - 기존 유사 향수 검색 API의 기능을 통합
+
+request:
+  method: POST
+  url: /internal/v1/rag/perfumes/search
+  headers:
+    Content-Type: application/json
+  body:
+    productIds:
+      - "550e8400-e29b-41d4-a716-446655440000"
+      - "550e8400-e29b-41d4-a716-446655440001"
+
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    results:
+      - id: "550e8400-e29b-41d4-a716-446655440000"
+        brand: "조말론"
+        name: "라임 바질 앤 만다린_CONTRACT"
+        concentration: "Eau de Cologne"
+        mainAccords:
+          - "시트러스"
+          - "아로마틱"
+        gender: "Unisex"
+        sizes:
+          - sizeMl: 30
+            price: 95000.00
+          - sizeMl: 100
+            price: 195000.00
+      - id: "550e8400-e29b-41d4-a716-446655440001"
+        brand: "아쿠아 디 파르마"
+        name: "콜로니아_CONTRACT"
+        concentration: "Eau de Cologne"
+        mainAccords:
+          - "시트러스"
+          - "우디"
+        gender: "Unisex"
+        sizes:
+          - sizeMl: 50
+            price: 120000.00
+          - sizeMl: 100
+            price: 180000.00
+    totalCount: 2
+  matchers:
+    body:
+      - path: $.results[0].id
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.results[1].id
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.totalCount
+        type: by_type

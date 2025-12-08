@@ -1,0 +1,27 @@
+name: rag_service_search_products_empty
+description: |
+  Consumer: rag-service
+  Purpose: 검색 결과가 없을 때의 응답
+
+request:
+  method: POST
+  url: /internal/v1/rag/perfumes/search
+  headers:
+    Content-Type: application/json
+  body:
+    query: "존재하지 않는 향수"
+    topK: 5
+
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    results: []
+    totalCount: 0
+  matchers:
+    body:
+      - path: $.results
+        type: by_type
+      - path: $.totalCount
+        type: by_type

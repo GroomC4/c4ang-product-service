@@ -1,0 +1,70 @@
+name: rag_service_get_product_detail_success
+description: |
+  Consumer: rag-service
+  Purpose: 챗봇이 특정 향수의 상세 정보를 조회할 때 사용 (v2)
+  v2 변경사항:
+  - sizes 배열 추가 (용량별 가격)
+  - seasonScore, dayNightScore 추가
+  - 노트들은 배열 타입
+
+request:
+  method: GET
+  url: /internal/v1/rag/perfumes/550e8400-e29b-41d4-a716-446655440002
+  headers:
+    Content-Type: application/json
+
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    id: "550e8400-e29b-41d4-a716-446655440002"
+    brand: "디올"
+    name: "미스 디올_CONTRACT"
+    concentration: "Eau de Parfum"
+    mainAccords:
+      - "플로랄"
+      - "로즈"
+    topNotes:
+      - "만다린"
+      - "베르가못"
+    middleNotes:
+      - "로즈"
+      - "피오니"
+    baseNotes:
+      - "머스크"
+      - "샌달우드"
+    description: null
+    gender: "Female"
+    seasonScore:
+      spring: 35.0
+      summer: 10.0
+      fall: 40.0
+      winter: 15.0
+    dayNightScore:
+      day: 70.0
+      night: 30.0
+    sizes:
+      - sizeMl: 30
+        price: 120000.00
+      - sizeMl: 50
+        price: 180000.00
+      - sizeMl: 100
+        price: 280000.00
+    imageUrl: null
+    detailUrl: "https://example.com/products/miss-dior"
+  matchers:
+    body:
+      - path: $.id
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.brand
+        type: by_type
+      - path: $.name
+        type: by_type
+      - path: $.topNotes
+        type: by_type
+      - path: $.middleNotes
+        type: by_type
+      - path: $.baseNotes
+        type: by_type

@@ -1,0 +1,52 @@
+name: rag_service_search_products_success
+description: |
+  Consumer: rag-service
+  Purpose: 챗봇이 조건에 맞는 향수를 검색할 때 사용 (v2)
+  v2 변경사항:
+  - sizes 배열 추가 (용량별 가격)
+  - similarityScore, topK 제거 (RAG 벡터DB에서 처리)
+  - mainAccords는 배열 타입
+  - product_ids 파라미터로 유사 향수 ID 조회 가능
+
+request:
+  method: POST
+  url: /internal/v1/rag/perfumes/search
+  headers:
+    Content-Type: application/json
+  body:
+    brand: "조말론"
+    gender: "Unisex"
+
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    results:
+      - id: "550e8400-e29b-41d4-a716-446655440000"
+        brand: "조말론"
+        name: "라임 바질 앤 만다린_CONTRACT"
+        concentration: "Eau de Cologne"
+        mainAccords:
+          - "시트러스"
+          - "아로마틱"
+        description: null
+        gender: "Unisex"
+        imageUrl: null
+        sizes:
+          - sizeMl: 30
+            price: 95000.00
+          - sizeMl: 100
+            price: 195000.00
+    totalCount: 1
+  matchers:
+    body:
+      - path: $.results[0].id
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.results[0].brand
+        type: by_type
+      - path: $.results[0].name
+        type: by_type
+      - path: $.totalCount
+        type: by_type
