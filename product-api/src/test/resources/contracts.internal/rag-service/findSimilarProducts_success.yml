@@ -1,0 +1,47 @@
+name: rag_service_find_similar_products_success
+description: |
+  Consumer: rag-service
+  Purpose: 챗봇이 특정 향수와 유사한 향수를 검색할 때 사용
+
+request:
+  method: POST
+  url: /internal/v1/rag/products/similar
+  headers:
+    Content-Type: application/json
+  body:
+    productId: "550e8400-e29b-41d4-a716-446655440000"
+    topK: 3
+
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    baseProductId: "550e8400-e29b-41d4-a716-446655440000"
+    similarProducts:
+      - id: "550e8400-e29b-41d4-a716-446655440001"
+        brand: "조말론"
+        name: "피오니 앤 블러쉬 스웨이드"
+        mainAccords: "플로랄"
+        price: 210000.00
+        similarityScore: 0.89
+      - id: "550e8400-e29b-41d4-a716-446655440002"
+        brand: "샤넬"
+        name: "코코 마드모아젤"
+        mainAccords: "플로랄, 시트러스"
+        price: 220000.00
+        similarityScore: 0.85
+  matchers:
+    body:
+      - path: $.baseProductId
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.similarProducts[0].id
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.similarProducts[0].brand
+        type: by_type
+      - path: $.similarProducts[0].name
+        type: by_type
+      - path: $.similarProducts[0].similarityScore
+        type: by_type

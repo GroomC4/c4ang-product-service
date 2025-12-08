@@ -1,0 +1,50 @@
+name: rag_service_search_products_success
+description: |
+  Consumer: rag-service
+  Purpose: 챗봇이 자연어 쿼리로 향수를 검색/추천할 때 사용
+
+request:
+  method: POST
+  url: /internal/v1/rag/products/search
+  headers:
+    Content-Type: application/json
+  body:
+    query: "상큼한 여름 향수"
+    scentFamily: "시트러스"
+    season: "여름"
+    topK: 5
+
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body:
+    results:
+      - id: "550e8400-e29b-41d4-a716-446655440000"
+        brand: "조말론"
+        name: "라임 바질 앤 만다린"
+        concentration: "EDC"
+        mainAccords: "시트러스, 아로마틱"
+        description: "상쾌한 시트러스 향이 특징인 여름 향수"
+        price: 195000.00
+        similarityScore: 0.95
+      - id: "550e8400-e29b-41d4-a716-446655440001"
+        brand: "아쿠아 디 파르마"
+        name: "콜로니아"
+        concentration: "EDC"
+        mainAccords: "시트러스, 우디"
+        description: "클래식한 이탈리안 시트러스 향수"
+        price: 180000.00
+        similarityScore: 0.89
+    totalCount: 2
+  matchers:
+    body:
+      - path: $.results[0].id
+        type: by_regex
+        value: "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+      - path: $.results[0].brand
+        type: by_type
+      - path: $.results[0].name
+        type: by_type
+      - path: $.totalCount
+        type: by_type
