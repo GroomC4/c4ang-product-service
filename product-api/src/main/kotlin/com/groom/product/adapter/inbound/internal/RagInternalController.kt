@@ -35,13 +35,13 @@ import java.util.UUID
  * - 유사 향수 검색 API는 검색 API의 product_ids 파라미터로 통합
  *
  * Endpoints:
- * - POST /internal/v1/rag/products/search - 향수 검색
- * - GET /internal/v1/rag/products/{id} - 향수 상세 조회
- * - POST /internal/v1/rag/products/compare - 향수 비교
+ * - POST /internal/v1/rag/perfumes/search - 향수 검색
+ * - GET /internal/v1/rag/perfumes/{id} - 향수 상세 조회
+ * - POST /internal/v1/rag/perfumes/compare - 향수 비교
  */
 @Tag(name = "RAG Internal API", description = "Internal API for RAG (chatbot) service")
 @RestController
-@RequestMapping("/internal/v1/rag/products")
+@RequestMapping("/internal/v1/rag/perfumes")
 class RagInternalController(
     private val ragPerfumeService: RagPerfumeService,
 ) {
