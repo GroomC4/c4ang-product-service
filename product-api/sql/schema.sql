@@ -183,3 +183,81 @@ CREATE INDEX IF NOT EXISTS idx_p_product_status ON p_product (status);
 CREATE INDEX IF NOT EXISTS idx_p_product_hidden ON p_product (hidden_at);
 CREATE INDEX IF NOT EXISTS idx_p_product_name_trgm ON p_product USING GIN (product_name gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_p_product_store_name_trgm ON p_product USING GIN (store_name gin_trgm_ops);
+
+-- =====================================================
+-- Perfume Domain (향수 특화 정보)
+-- =====================================================
+
+-- 향수 특화 정보 테이블
+-- p_product와 1:1 관계 (논리적 FK, 물리적 제약 없음)
+CREATE TABLE IF NOT EXISTS p_perfume (
+    id                UUID PRIMARY KEY,
+    product_id        UUID NOT NULL,
+    brand             TEXT NOT NULL,
+    name              TEXT NOT NULL,
+    concentration     TEXT,
+    main_accords      JSONB,
+    top_notes         JSONB,
+    middle_notes      JSONB,
+    base_notes        JSONB,
+    notes_score       JSONB,
+    season_score      JSONB,
+    day_night_score   JSONB,
+    gender            TEXT CHECK (gender IN ('Male', 'Female', 'Unisex')),
+    sizes             JSONB,
+    detail_url        TEXT,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at        TIMESTAMPTZ,
+    UNIQUE (brand, name)
+);
+
+COMMENT ON TABLE p_perfume IS '향수 특화 정보를 저장하는 테이블. p_product와 1:1 관계.';
+COMMENT ON COLUMN p_perfume.id IS '향수 정보의 UUID 기본 키.';
+COMMENT ON COLUMN p_perfume.product_id IS '연결된 p_product ID (논리적 FK).';
+COMMENT ON COLUMN p_perfume.brand IS '브랜드명.';
+COMMENT ON COLUMN p_perfume.name IS '향수명.';
+COMMENT ON COLUMN p_perfume.concentration IS '농도 (오 드 퍼퓸, 오 드 뚜왈렛 등).';
+COMMENT ON COLUMN p_perfume.main_accords IS '주요 향조 배열 (JSONB).';
+COMMENT ON COLUMN p_perfume.top_notes IS '탑노트 배열 (JSONB).';
+COMMENT ON COLUMN p_perfume.middle_notes IS '미들노트 배열 (JSONB).';
+COMMENT ON COLUMN p_perfume.base_notes IS '베이스노트 배열 (JSONB).';
+COMMENT ON COLUMN p_perfume.notes_score IS '노트별 점수 (JSONB).';
+COMMENT ON COLUMN p_perfume.season_score IS '계절 점수 (JSONB). 예: {"spring": 24.1, "summer": 3.8, "fall": 95.5, "winter": 14.2}';
+COMMENT ON COLUMN p_perfume.day_night_score IS '주야간 점수 (JSONB). 예: {"day": 47.1, "night": 25.9}';
+COMMENT ON COLUMN p_perfume.gender IS '성별 타겟 (Male/Female/Unisex).';
+COMMENT ON COLUMN p_perfume.sizes IS '용량별 가격 정보 (JSONB). 예: [{"size_ml": 30, "price": 120000}, {"size_ml": 50, "price": 180000}]';
+COMMENT ON COLUMN p_perfume.detail_url IS '원본 상세 페이지 URL.';
+COMMENT ON COLUMN p_perfume.created_at IS '레코드 생성 시각.';
+COMMENT ON COLUMN p_perfume.updated_at IS '레코드 최종 수정 시각.';
+COMMENT ON COLUMN p_perfume.deleted_at IS '소프트 삭제 시각.';
+
+CREATE INDEX IF NOT EXISTS idx_p_perfume_product ON p_perfume (product_id);
+CREATE INDEX IF NOT EXISTS idx_p_perfume_brand ON p_perfume (brand);
+CREATE INDEX IF NOT EXISTS idx_p_perfume_gender ON p_perfume (gender);
+CREATE INDEX IF NOT EXISTS idx_p_perfume_brand_trgm ON p_perfume USING GIN (brand gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_p_perfume_name_trgm ON p_perfume USING GIN (name gin_trgm_ops);
+
+-- 노트 이미지 참조 테이블
+-- 향수 노트(재료)의 이미지 URL을 관리하는 마스터 데이터
+CREATE TABLE IF NOT EXISTS p_note_image (
+    id                UUID PRIMARY KEY,
+    category          TEXT NOT NULL,
+    note_name         TEXT NOT NULL,
+    image_url         TEXT NOT NULL,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (category, note_name)
+);
+
+COMMENT ON TABLE p_note_image IS '향수 노트(재료) 이미지를 관리하는 참조 테이블.';
+COMMENT ON COLUMN p_note_image.id IS '노트 이미지의 UUID 기본 키.';
+COMMENT ON COLUMN p_note_image.category IS '노트 카테고리 (예: Citrus Smells, Floral).';
+COMMENT ON COLUMN p_note_image.note_name IS '노트 이름 (예: Bergamot, Rose).';
+COMMENT ON COLUMN p_note_image.image_url IS '노트 이미지 URL.';
+COMMENT ON COLUMN p_note_image.created_at IS '레코드 생성 시각.';
+COMMENT ON COLUMN p_note_image.updated_at IS '레코드 최종 수정 시각.';
+
+CREATE INDEX IF NOT EXISTS idx_p_note_image_category ON p_note_image (category);
+CREATE INDEX IF NOT EXISTS idx_p_note_image_note_name ON p_note_image (note_name);
+CREATE INDEX IF NOT EXISTS idx_p_note_image_note_name_trgm ON p_note_image USING GIN (note_name gin_trgm_ops);
