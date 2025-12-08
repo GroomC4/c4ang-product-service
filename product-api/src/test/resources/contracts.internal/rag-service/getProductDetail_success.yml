@@ -9,7 +9,7 @@ description: |
 
 request:
   method: GET
-  url: /internal/v1/rag/products/550e8400-e29b-41d4-a716-446655440000
+  url: /internal/v1/rag/perfumes/550e8400-e29b-41d4-a716-446655440002
   headers:
     Content-Type: application/json
 
@@ -18,10 +18,10 @@ response:
   headers:
     Content-Type: application/json
   body:
-    id: "550e8400-e29b-41d4-a716-446655440000"
+    id: "550e8400-e29b-41d4-a716-446655440002"
     brand: "디올"
-    name: "미스 디올"
-    concentration: "EDP"
+    name: "미스 디올_CONTRACT"
+    concentration: "Eau de Parfum"
     mainAccords:
       - "플로랄"
       - "로즈"
@@ -34,7 +34,7 @@ response:
     baseNotes:
       - "머스크"
       - "샌달우드"
-    description: "우아한 플로랄 향수로 로맨틱한 분위기를 연출합니다."
+    description: null
     gender: "Female"
     seasonScore:
       spring: 35.0
@@ -51,7 +51,7 @@ response:
         price: 180000.00
       - sizeMl: 100
         price: 280000.00
-    imageUrl: "https://example.com/images/miss-dior.jpg"
+    imageUrl: null
     detailUrl: "https://example.com/products/miss-dior"
   matchers:
     body:

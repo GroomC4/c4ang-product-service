@@ -8,7 +8,7 @@ description: |
 
 request:
   method: POST
-  url: /internal/v1/rag/products/search
+  url: /internal/v1/rag/perfumes/search
   headers:
     Content-Type: application/json
   body:
@@ -24,8 +24,8 @@ response:
     results:
       - id: "550e8400-e29b-41d4-a716-446655440000"
         brand: "조말론"
-        name: "라임 바질 앤 만다린"
-        concentration: "EDC"
+        name: "라임 바질 앤 만다린_CONTRACT"
+        concentration: "Eau de Cologne"
         mainAccords:
           - "시트러스"
           - "아로마틱"
@@ -37,8 +37,8 @@ response:
             price: 195000.00
       - id: "550e8400-e29b-41d4-a716-446655440001"
         brand: "아쿠아 디 파르마"
-        name: "콜로니아"
-        concentration: "EDC"
+        name: "콜로니아_CONTRACT"
+        concentration: "Eau de Cologne"
         mainAccords:
           - "시트러스"
           - "우디"

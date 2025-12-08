@@ -5,7 +5,7 @@ description: |
 
 request:
   method: POST
-  url: /internal/v1/rag/products/search
+  url: /internal/v1/rag/perfumes/search
   headers:
     Content-Type: application/json
   body:

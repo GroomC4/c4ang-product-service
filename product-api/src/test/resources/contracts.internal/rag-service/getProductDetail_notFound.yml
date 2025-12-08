@@ -5,7 +5,7 @@ description: |
 
 request:
   method: GET
-  url: /internal/v1/rag/products/00000000-0000-0000-0000-000000000000
+  url: /internal/v1/rag/perfumes/00000000-0000-0000-0000-000000000000
   headers:
     Content-Type: application/json
 

@@ -8,7 +8,7 @@ description: |
 
 request:
   method: POST
-  url: /internal/v1/rag/products/compare
+  url: /internal/v1/rag/perfumes/compare
   headers:
     Content-Type: application/json
   body:
@@ -24,43 +24,52 @@ response:
     comparisonCount: 2
     products:
       - id: "550e8400-e29b-41d4-a716-446655440000"
-        brand: "디올"
-        name: "미스 디올"
-        concentration: "EDP"
+        brand: "조말론"
+        name: "라임 바질 앤 만다린_CONTRACT"
+        concentration: "Eau de Cologne"
         mainAccords:
-          - "플로랄"
-          - "로즈"
+          - "시트러스"
+          - "아로마틱"
         topNotes:
-          - "만다린"
+          - "라임"
+          - "만다린 오렌지"
+          - "베르가못"
         middleNotes:
-          - "로즈"
+          - "바질"
+          - "타임"
         baseNotes:
-          - "머스크"
-        gender: "Female"
+          - "베티버"
+          - "앰버그리스"
+        gender: "Unisex"
         sizes:
           - sizeMl: 30
-            price: 120000.00
-          - sizeMl: 50
-            price: 180000.00
+            price: 95000.00
+          - sizeMl: 100
+            price: 195000.00
       - id: "550e8400-e29b-41d4-a716-446655440001"
-        brand: "샤넬"
-        name: "코코 마드모아젤"
-        concentration: "EDP"
+        brand: "아쿠아 디 파르마"
+        name: "콜로니아_CONTRACT"
+        concentration: "Eau de Cologne"
         mainAccords:
-          - "플로랄"
           - "시트러스"
+          - "우디"
         topNotes:
+          - "레몬"
+          - "베르가못"
           - "오렌지"
         middleNotes:
-          - "재스민"
+          - "라벤더"
+          - "로즈마리"
         baseNotes:
-          - "바닐라"
-        gender: "Female"
+          - "베티버"
+          - "샌달우드"
+          - "파촐리"
+        gender: "Unisex"
         sizes:
           - sizeMl: 50
-            price: 200000.00
+            price: 120000.00
           - sizeMl: 100
-            price: 320000.00
+            price: 180000.00
   matchers:
     body:
       - path: $.comparisonCount

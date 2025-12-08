@@ -10,7 +10,7 @@ description: |
 
 request:
   method: POST
-  url: /internal/v1/rag/products/search
+  url: /internal/v1/rag/perfumes/search
   headers:
     Content-Type: application/json
   body:
@@ -25,14 +25,14 @@ response:
     results:
       - id: "550e8400-e29b-41d4-a716-446655440000"
         brand: "조말론"
-        name: "라임 바질 앤 만다린"
-        concentration: "EDC"
+        name: "라임 바질 앤 만다린_CONTRACT"
+        concentration: "Eau de Cologne"
         mainAccords:
           - "시트러스"
           - "아로마틱"
-        description: "상쾌한 시트러스 향이 특징인 여름 향수"
+        description: null
         gender: "Unisex"
-        imageUrl: "https://example.com/images/lime-basil.jpg"
+        imageUrl: null
         sizes:
           - sizeMl: 30
             price: 95000.00
