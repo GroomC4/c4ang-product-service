@@ -12,18 +12,17 @@ import com.groom.product.application.service.DeleteProductService
 import com.groom.product.application.service.RegisterProductService
 import com.groom.product.application.service.ToggleProductHideService
 import com.groom.product.application.service.UpdateProductService
-import com.groom.product.common.util.IstioHeaderExtractor
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
@@ -51,7 +50,6 @@ class ProductCommandController(
     private val updateProductService: UpdateProductService,
     private val deleteProductService: DeleteProductService,
     private val toggleProductHideService: ToggleProductHideService,
-    private val istioHeaderExtractor: IstioHeaderExtractor,
 ) {
     /**
      * 새로운 상품을 등록합니다.
@@ -78,10 +76,9 @@ class ProductCommandController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun registerProduct(
+        @RequestHeader("X-User-Id") userId: UUID,
         @RequestBody request: RegisterProductRequest,
-        httpServletRequest: HttpServletRequest,
     ): RegisterProductResponse {
-        val userId = istioHeaderExtractor.extractUserId(httpServletRequest)
         val command = request.toCommand()
         val result = registerProductService.register(userId, command)
         return RegisterProductResponse.from(result)
@@ -108,11 +105,12 @@ class ProductCommandController(
     )
     @PutMapping("/{id}")
     fun updateProduct(
+        @RequestHeader("X-User-Id") userId: UUID,
         @PathVariable id: UUID,
         @RequestBody request: UpdateProductRequest,
     ): UpdateProductResponse {
         val command = request.toCommand(id)
-        val result = updateProductService.update(command)
+        val result = updateProductService.update(userId, command)
         return UpdateProductResponse.from(result)
     }
 

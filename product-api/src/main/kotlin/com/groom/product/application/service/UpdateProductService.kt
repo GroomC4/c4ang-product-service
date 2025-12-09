@@ -2,6 +2,7 @@ package com.groom.product.application.service
 
 import com.groom.product.application.dto.UpdateProductCommand
 import com.groom.product.application.dto.UpdateProductResult
+import com.groom.product.common.exception.StoreException
 import com.groom.product.domain.event.DomainEventPublisher
 import com.groom.product.domain.event.ProductInfoUpdatedEvent
 import com.groom.product.domain.model.Price
@@ -10,8 +11,10 @@ import com.groom.product.domain.model.ProductName
 import com.groom.product.domain.model.StockQuantity
 import com.groom.product.domain.model.ThumbnailUrl
 import com.groom.product.domain.port.LoadProductPort
+import com.groom.product.domain.port.LoadStorePort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 /**
  * 상품 수정 서비스.
@@ -21,10 +24,11 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class UpdateProductService(
     private val loadProductPort: LoadProductPort,
+    private val loadStorePort: LoadStorePort,
     private val domainEventPublisher: DomainEventPublisher,
 ) {
     @Transactional
-    fun update(command: UpdateProductCommand): UpdateProductResult {
+    fun update(requestUserId: UUID, command: UpdateProductCommand): UpdateProductResult {
         // 1. Value Objects 생성 및 유효성 검사
         val productName = ProductName.from(command.name)
         val price = Price.from(command.price)
@@ -37,10 +41,12 @@ class UpdateProductService(
             loadProductPort.loadById(command.productId)
                 ?: throw IllegalArgumentException("Product not found: ${command.productId}")
 
-        // 3. 스토어 소유권 검증
-        require(product.storeId == command.storeId) {
-            "Product does not belong to this store"
-        }
+        // 3. 스토어 소유권 검증 (요청한 사용자가 해당 스토어의 소유자인지 확인)
+        loadStorePort.loadByIdAndOwnerId(product.storeId, requestUserId)
+            ?: throw StoreException.StoreAccessDenied(
+                storeId = product.storeId,
+                userId = requestUserId,
+            )
 
         // 4. 상품 정보 업데이트 (도메인 로직)
         val hasChanges =
