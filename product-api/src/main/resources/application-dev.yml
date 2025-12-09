@@ -79,7 +79,7 @@ security:
 feign:
   clients:
     store-service:
-      url: ${STORE_SERVICE_URL:http://store-api:8082}
+      url: ${STORE_SERVICE_URL:http://store-api}
       connect-timeout: 5000
       read-timeout: 5000
       logger-level: full
